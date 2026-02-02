@@ -458,4 +458,4 @@ npm run build
 
 ---
 
-**Made with ❤️ by the SwatuDevHouse Team**
+**Made with ❤️ by SwatuDevHouse Team**
