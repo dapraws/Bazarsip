@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, lazy, Suspense } from "react";
 
-const AdminSidebar = lazy(() => import("app/components/admin/Sidebar"));
+const AdminSidebar = lazy(() => import("@/components/admin/Sidebar"));
 
 export default function AdminLayout({
   children,
