@@ -1,69 +1,122 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+
+type Product = {
+  id: number;
+  name: string;
+  price: number;
+  image_url?: string | null;
+};
+
+type CartStoredItem = {
+  productId: number;
+  quantity: number;
+};
+
+type CartItem = CartStoredItem & {
+  product?: Product; // optional karena bisa gagal fetch
+};
 
 export default function CartPage() {
   const router = useRouter();
-  const [cart, setCart] = useState<any[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadCart();
+  const loadCart = useCallback(async () => {
+    setLoading(true);
+
+    let cartData: CartStoredItem[] = [];
+    try {
+      cartData = JSON.parse(
+        localStorage.getItem("cart") ?? "[]",
+      ) as CartStoredItem[];
+    } catch {
+      cartData = [];
+    }
+
+    try {
+      const cartWithProducts: CartItem[] = await Promise.all(
+        cartData.map(async (item) => {
+          try {
+            const res = await fetch(`/api/products/${item.productId}`, {
+              cache: "no-store",
+            });
+
+            if (!res.ok) {
+              // kalau 404/500, tetap balikin item tanpa product
+              return { ...item, product: undefined };
+            }
+
+            const data: { data?: Product } = await res.json();
+            return { ...item, product: data.data };
+          } catch {
+            return { ...item, product: undefined };
+          }
+        }),
+      );
+
+      setCart(cartWithProducts);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  async function loadCart() {
-    const cartData = JSON.parse(localStorage.getItem("cart") || "[]");
-    const cartWithProducts = await Promise.all(
-      cartData.map(async (item: any) => {
-        const res = await fetch(`/api/products/${item.productId}`);
-        const data = await res.json();
-        return { ...item, product: data.data };
-      }),
+  useEffect(() => {
+    void loadCart();
+  }, [loadCart]);
+
+  const persistCart = (updated: CartItem[]) => {
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(
+        updated.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+      ),
     );
-    setCart(cartWithProducts);
-    setLoading(false);
-  }
+  };
 
   function updateQuantity(productId: number, newQuantity: number) {
     if (newQuantity < 1) return;
-    const updated = cart.map((item) =>
-      item.productId === productId ? { ...item, quantity: newQuantity } : item,
-    );
-    setCart(updated);
-    localStorage.setItem(
-      "cart",
-      JSON.stringify(
-        updated.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-      ),
-    );
+
+    setCart((prev) => {
+      const updated = prev.map((item) =>
+        item.productId === productId
+          ? { ...item, quantity: newQuantity }
+          : item,
+      );
+      persistCart(updated);
+      return updated;
+    });
   }
 
   function removeItem(productId: number) {
-    const updated = cart.filter((item) => item.productId !== productId);
-    setCart(updated);
-    localStorage.setItem(
-      "cart",
-      JSON.stringify(
-        updated.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-      ),
-    );
+    setCart((prev) => {
+      const updated = prev.filter((item) => item.productId !== productId);
+      persistCart(updated);
+      return updated;
+    });
   }
 
-  const subtotal = cart.reduce(
-    (sum, item) => sum + (item.product?.price || 0) * item.quantity,
-    0,
-  );
+  const subtotal = useMemo(() => {
+    return cart.reduce(
+      (sum, item) => sum + (item.product?.price ?? 0) * item.quantity,
+      0,
+    );
+  }, [cart]);
+
   const tax = subtotal * 0.1;
   const total = subtotal + tax;
 
-  if (loading)
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin h-12 w-12 border-b-2 border-blue-600 rounded-full"></div>
       </div>
     );
+  }
 
   if (cart.length === 0) {
     return (
@@ -93,23 +146,31 @@ export default function CartPage() {
                 key={item.productId}
                 className="bg-white rounded-xl shadow-sm border p-6 flex items-center space-x-4"
               >
-                <img
-                  src={item.product?.image_url}
-                  alt={item.product?.name}
+                <Image
+                  src={item.product?.image_url ?? "/placeholder.png"}
+                  alt={item.product?.name ?? "Product"}
+                  width={96}
+                  height={96}
                   className="w-24 h-24 object-cover rounded-lg"
+                  unoptimized
                 />
+
                 <div className="flex-1">
-                  <h3 className="font-semibold">{item.product?.name}</h3>
+                  <h3 className="font-semibold">
+                    {item.product?.name ?? "Product unavailable"}
+                  </h3>
                   <p className="text-gray-600">
-                    Rp {item.product?.price.toLocaleString("id-ID")}
+                    Rp {(item.product?.price ?? 0).toLocaleString("id-ID")}
                   </p>
                 </div>
+
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() =>
                       updateQuantity(item.productId, item.quantity - 1)
                     }
                     className="w-8 h-8 border rounded hover:bg-gray-100"
+                    aria-label="Decrease quantity"
                   >
                     -
                   </button>
@@ -119,15 +180,17 @@ export default function CartPage() {
                       updateQuantity(item.productId, item.quantity + 1)
                     }
                     className="w-8 h-8 border rounded hover:bg-gray-100"
+                    aria-label="Increase quantity"
                   >
                     +
                   </button>
                 </div>
+
                 <div className="text-right">
                   <p className="font-bold">
                     Rp{" "}
                     {(
-                      (item.product?.price || 0) * item.quantity
+                      (item.product?.price ?? 0) * item.quantity
                     ).toLocaleString("id-ID")}
                   </p>
                   <button
@@ -158,6 +221,7 @@ export default function CartPage() {
                   <span>Rp {total.toLocaleString("id-ID")}</span>
                 </div>
               </div>
+
               <button
                 onClick={() => router.push("/checkout")}
                 className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
