@@ -3,8 +3,8 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import Link from "next/link";
 
-const ProductTable = lazy(() => import("app/components/admin/ProductTable"));
-const ProductsSearch = lazy(() => import("app/components/admin/ProductSearch"));
+const ProductTable = lazy(() => import("@/components/admin/ProductTable"));
+const ProductsSearch = lazy(() => import("@/components/admin/ProductSearch"));
 
 interface Product {
   id: number;
