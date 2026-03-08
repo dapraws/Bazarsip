@@ -1,9 +1,9 @@
 import { pool } from "@/lib/db";
 import Link from "next/link";
 import { Suspense } from "react";
-import StatsCards from "app/components/admin/StatsCard";
-import QuickActions from "app/components/admin/QuickActions";
-import RecentOrdersTable from "app/components/admin/RecentOrderTable";
+import StatsCards from "@/components/admin/StatsCard";
+import QuickActions from "@/components/admin/QuickActions";
+import RecentOrdersTable from "@/components/admin/RecentOrderTable";
 
 async function getStats() {
   const [products, categories, orders, users] = await Promise.all([
@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600 mt-1">
-          Welcome back! Here's what's happening today.
+          {"Welcome back! Here's what's happening today."}
         </p>
       </div>
 
