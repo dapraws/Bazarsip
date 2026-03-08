@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 interface Category {
   id: number;
@@ -43,18 +44,14 @@ export default function EditProductPage({ params }: PageProps) {
   }, []);
 
   useEffect(() => {
-    if (productId) {
-      fetchProduct();
-    }
+    if (productId) fetchProduct();
   }, [productId]);
 
   async function fetchCategories() {
     try {
       const res = await fetch("/api/categories");
       const data = await res.json();
-      if (data.success) {
-        setCategories(data.data);
-      }
+      if (data.success) setCategories(data.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -125,24 +122,6 @@ export default function EditProductPage({ params }: PageProps) {
     }
   }
 
-  function addImageUrl() {
-    setFormData({
-      ...formData,
-      images: [...formData.images, ""],
-    });
-  }
-
-  function updateImageUrl(index: number, value: string) {
-    const newImages = [...formData.images];
-    newImages[index] = value;
-    setFormData({ ...formData, images: newImages });
-  }
-
-  function removeImageUrl(index: number) {
-    const newImages = formData.images.filter((_, i) => i !== index);
-    setFormData({ ...formData, images: newImages });
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -156,13 +135,11 @@ export default function EditProductPage({ params }: PageProps) {
 
   return (
     <div className="max-w-4xl">
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Edit Product</h1>
         <p className="text-gray-600 mt-1">Update product information</p>
       </div>
 
-      {/* Form */}
       <form
         onSubmit={handleSubmit}
         className="bg-white rounded-xl shadow-sm border border-gray-100"
@@ -287,97 +264,29 @@ export default function EditProductPage({ params }: PageProps) {
             </select>
           </div>
 
-          {/* Main Image URL */}
-          <div>
-            <label
-              htmlFor="image_url"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Main Image URL
-            </label>
-            <input
-              type="url"
-              id="image_url"
-              value={formData.image_url}
-              onChange={(e) =>
-                setFormData({ ...formData, image_url: e.target.value })
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="https://example.com/image.jpg"
-            />
-            {formData.image_url && (
-              <div className="mt-2">
-                <img
-                  src={formData.image_url}
-                  alt="Preview"
-                  className="w-32 h-32 object-cover rounded-lg border border-gray-200"
-                  onError={(e) => {
-                    e.currentTarget.src = "";
-                    e.currentTarget.style.display = "none";
-                  }}
-                />
-              </div>
-            )}
-          </div>
+          {/* Main Image — Cloudinary Upload */}
+          <ImageUpload
+            folder="bazarsip/products"
+            label="Main Image"
+            hint="This image will be shown as the product thumbnail."
+            value={formData.image_url}
+            onChange={(val) =>
+              setFormData({ ...formData, image_url: val as string })
+            }
+            multiple={false}
+          />
 
-          {/* Additional Images */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Additional Images
-            </label>
-            <div className="space-y-2">
-              {formData.images.map((img, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <input
-                    type="url"
-                    value={img}
-                    onChange={(e) => updateImageUrl(index, e.target.value)}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://example.com/image.jpg"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImageUrl(index)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={addImageUrl}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center space-x-1"
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                <span>Add Image URL</span>
-              </button>
-            </div>
-          </div>
+          {/* Gallery Images — Cloudinary Upload */}
+          <ImageUpload
+            folder="bazarsip/products"
+            label="Gallery Images"
+            hint="First image is the main display. Drag & drop or click to add multiple images."
+            value={formData.images}
+            onChange={(val) =>
+              setFormData({ ...formData, images: val as string[] })
+            }
+            multiple={true}
+          />
 
           {/* Active Status */}
           <div className="flex items-center">
