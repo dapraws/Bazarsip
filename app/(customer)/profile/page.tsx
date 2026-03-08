@@ -1,19 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 export default function ProfilePage() {
   const [formData, setFormData] = useState({
     name: "John Doe",
     email: "customer@bazarsip.com",
+    avatar_url: "",
     current_password: "",
     new_password: "",
     confirm_password: "",
   });
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
 
   async function handleUpdateProfile(e: React.FormEvent) {
     e.preventDefault();
-    alert("Profile update coming soon!");
+    setSaving(true);
+    // TODO: wire up to /api/users/:id
+    await new Promise((r) => setTimeout(r, 600));
+    setMessage("Profile update coming soon!");
+    setSaving(false);
   }
 
   return (
@@ -25,9 +33,45 @@ export default function ProfilePage() {
           onSubmit={handleUpdateProfile}
           className="bg-white rounded-xl shadow-sm border p-6 space-y-6"
         >
+          {message && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+              {message}
+            </div>
+          )}
+
+          {/* Avatar Upload */}
+          <div className="flex items-center gap-6">
+            <div className="flex-shrink-0">
+              {formData.avatar_url ? (
+                <img
+                  src={formData.avatar_url}
+                  alt="Avatar"
+                  className="w-20 h-20 rounded-full object-cover border-4 border-white shadow"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white text-2xl font-bold shadow">
+                  {formData.name.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <ImageUpload
+                folder="bazarsip/users"
+                label="Profile Photo"
+                hint="JPG, PNG or WebP. Max 5MB."
+                value={formData.avatar_url}
+                onChange={(val) =>
+                  setFormData({ ...formData, avatar_url: val as string })
+                }
+                multiple={false}
+              />
+            </div>
+          </div>
+
+          {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Name
+              Full Name
             </label>
             <input
               type="text"
@@ -39,6 +83,7 @@ export default function ProfilePage() {
             />
           </div>
 
+          {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Email
@@ -53,6 +98,7 @@ export default function ProfilePage() {
             />
           </div>
 
+          {/* Change Password */}
           <div className="pt-6 border-t">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               Change Password
@@ -111,9 +157,10 @@ export default function ProfilePage() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium"
+            disabled={saving}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
           >
-            Save Changes
+            {saving ? "Saving..." : "Save Changes"}
           </button>
         </form>
       </div>

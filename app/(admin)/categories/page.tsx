@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import ImageUpload from "@/components/ui/ImageUpload";
 
 interface Category {
   id: number;
@@ -32,10 +32,7 @@ export default function AdminCategoriesPage() {
       setLoading(true);
       const res = await fetch("/api/categories");
       const data = await res.json();
-
-      if (data.success) {
-        setCategories(data.data);
-      }
+      if (data.success) setCategories(data.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
     } finally {
@@ -99,9 +96,7 @@ export default function AdminCategoriesPage() {
     }
 
     try {
-      const res = await fetch(`/api/categories/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`/api/categories/${id}`, { method: "DELETE" });
 
       if (res.ok) {
         alert("Category deleted successfully");
@@ -263,7 +258,7 @@ export default function AdminCategoriesPage() {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full">
+          <div className="bg-white rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
             <form onSubmit={handleSubmit}>
               <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-xl font-bold text-gray-900">
@@ -295,7 +290,10 @@ export default function AdminCategoriesPage() {
                   <textarea
                     value={formData.description}
                     onChange={(e) =>
-                      setFormData({ ...formData, description: e.target.value })
+                      setFormData({
+                        ...formData,
+                        description: e.target.value,
+                      })
                     }
                     rows={3}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -303,20 +301,17 @@ export default function AdminCategoriesPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Image URL
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.image_url}
-                    onChange={(e) =>
-                      setFormData({ ...formData, image_url: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
+                {/* Category Image — Cloudinary Upload */}
+                <ImageUpload
+                  folder="bazarsip/categories"
+                  label="Category Image"
+                  hint="Recommended: 800×480px or wider."
+                  value={formData.image_url}
+                  onChange={(val) =>
+                    setFormData({ ...formData, image_url: val as string })
+                  }
+                  multiple={false}
+                />
               </div>
 
               <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl flex items-center justify-end space-x-3">
