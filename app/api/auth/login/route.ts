@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { pool } from "@/lib/db";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { clientIp } from "@/lib/request";
+import { issueSession, issueChallenge } from "@/lib/session";
+import { logAudit } from "@/lib/audit";
 
 // Only failures count, so someone signing in repeatedly is never locked out
 // by their own success.
@@ -17,7 +18,14 @@ const loginLimiter = createRateLimiter(5, 15 * 60 * 1000);
 // with one valid account could reset it at will.
 const addressLimiter = createRateLimiter(20, 15 * 60 * 1000);
 
-function rejectOrThrottle(key: string, ip: string) {
+async function rejectOrThrottle(key: string, ip: string, email: string) {
+  await logAudit({
+    action: "login_failed",
+    entity: "user",
+    entityId: email,
+    ip,
+  });
+
   const perEmail = loginLimiter.hit(key);
   const perAddress = addressLimiter.hit(ip);
   const allowed = perEmail.allowed && perAddress.allowed;
@@ -70,54 +78,41 @@ export async function POST(req: NextRequest) {
     }
 
     const userRes = await pool.query(
-      "SELECT id, email, name, role, password FROM users WHERE email = $1",
+      "SELECT id, email, name, role, password, totp_enabled FROM users WHERE email = $1",
       [email],
     );
 
     if (userRes.rows.length === 0) {
-      return rejectOrThrottle(limiterKey, ip);
+      return rejectOrThrottle(limiterKey, ip, String(email).toLowerCase());
     }
 
     const user = userRes.rows[0];
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-      return rejectOrThrottle(limiterKey, ip);
+      return rejectOrThrottle(limiterKey, ip, String(email).toLowerCase());
     }
 
     loginLimiter.reset(limiterKey);
 
-    const token = jwt.sign(
-      {
-        userId: user.id,
-        email: user.email,
-        role: user.role,
-      },
-      process.env.JWT_SECRET!,
-      { expiresIn: "7d" },
-    );
+    // The password was right, but it is not a session yet. With a second
+    // factor on, the caller gets a short-lived challenge that permits one
+    // thing: submitting a code.
+    if (user.totp_enabled) {
+      return NextResponse.json({
+        success: true,
+        requires2fa: true,
+        challenge: issueChallenge(user.id),
+      });
+    }
 
-    const response = NextResponse.json({
-      success: true,
-      message: "Login successful",
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+    await logAudit({
+      action: "login",
+      actor: { userId: user.id, email: user.email },
+      ip,
     });
 
-    response.cookies.set("session", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
-    });
-
-    return response;
+    return issueSession(user);
   } catch (error: any) {
     console.error("Login error:", error);
     return NextResponse.json(

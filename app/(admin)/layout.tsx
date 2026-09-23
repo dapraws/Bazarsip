@@ -15,9 +15,9 @@ export default function AdminLayout({
   const router = useRouter();
 
   async function handleLogout() {
-    document.cookie = "session=; path=/; max-age=0";
-    router.push("/login");
-    router.refresh();
+    // The session cookie is httpOnly; only the server can clear it.
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/login";
   }
 
   return (

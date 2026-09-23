@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth, verifyAuth } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
+import { clientIp } from "@/lib/request";
 import { slugify, nextFreeSlug } from "@/lib/slug";
 import { GENDERS, AGE_GROUPS, STYLES } from "@/lib/labels";
 
@@ -228,6 +230,15 @@ export async function POST(req: NextRequest) {
         brand?.trim() || null,
       ],
     );
+
+    await logAudit({
+      action: "product_create",
+      actor: authResult.user,
+      entity: "product",
+      entityId: result.rows[0].id,
+      details: { name: result.rows[0].name, price: result.rows[0].price },
+      ip: clientIp(req),
+    });
 
     return NextResponse.json(
       {

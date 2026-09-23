@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
+import { clientIp } from "@/lib/request";
 
 // Public URLs address products and categories by slug; the admin UI still
 // links by id. slugify() never produces a purely numeric slug, so a numeric
@@ -179,6 +181,14 @@ export async function DELETE(
 
     // Delete category (CASCADE will delete related products)
     await pool.query("DELETE FROM categories WHERE id = $1", [id]);
+
+    await logAudit({
+      action: "category_delete",
+      actor: authResult.user,
+      entity: "category",
+      entityId: id,
+      ip: clientIp(req),
+    });
 
     return NextResponse.json({
       success: true,

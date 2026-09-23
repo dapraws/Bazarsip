@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
+import { clientIp } from "@/lib/request";
 import { normalizeWhatsapp } from "@/lib/whatsapp";
 
 // PUT - Admin only
@@ -78,6 +80,14 @@ export async function DELETE(
         { status: 404 },
       );
     }
+
+    await logAudit({
+      action: "supplier_delete",
+      actor: authResult.user,
+      entity: "supplier",
+      entityId: id,
+      ip: clientIp(req),
+    });
 
     return NextResponse.json({ success: true, message: "Supplier deleted" });
   } catch (error) {

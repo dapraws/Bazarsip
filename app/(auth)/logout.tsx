@@ -11,7 +11,7 @@ export default function LogoutButton() {
     setLoading(true);
 
     // Delete session cookie
-    document.cookie = "session=; path=/; max-age=0";
+    await fetch("/api/auth/logout", { method: "POST" });
 
     // Redirect to login
     router.push("/login");

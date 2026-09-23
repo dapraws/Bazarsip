@@ -2,6 +2,7 @@
 -- PostgreSQL version
 
 -- Drop tables if they exist (for fresh start)
+DROP TABLE IF EXISTS audit_log CASCADE;
 DROP TABLE IF EXISTS order_items CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
 DROP TABLE IF EXISTS cart_items CASCADE;
@@ -18,6 +19,12 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     role VARCHAR(50) DEFAULT 'customer' CHECK (role IN ('customer', 'admin')),
+    -- Two-factor. The secret exists before it is switched on, between showing
+    -- the QR and the first correct code.
+    totp_secret TEXT,
+    totp_enabled BOOLEAN NOT NULL DEFAULT false,
+    totp_last_step BIGINT, -- last accepted time step, so a code cannot be replayed
+    recovery_codes TEXT[], -- bcrypt hashes; these bypass the second factor
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -152,6 +159,27 @@ INSERT INTO categories (name, slug, description) VALUES
 --   UPDATE users SET role = 'admin' WHERE email = 'you@example.com';
 --
 -- Seeding a password hash here would mean shipping a known credential.
+
+-- Audit log: who changed what.
+--
+-- SET NULL with the email kept alongside, so removing the person who acted
+-- does not erase the record of what they did. Nothing in the application
+-- updates or deletes from this table.
+CREATE TABLE audit_log (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    user_email VARCHAR(255),
+    action VARCHAR(50) NOT NULL,
+    entity VARCHAR(50),
+    entity_id VARCHAR(64),
+    details JSONB,
+    ip VARCHAR(64),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_audit_log_created ON audit_log(created_at DESC);
+CREATE INDEX idx_audit_log_user ON audit_log(user_id);
+CREATE INDEX idx_audit_log_entity ON audit_log(entity, entity_id);
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()

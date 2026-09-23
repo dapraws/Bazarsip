@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
+import { clientIp } from "@/lib/request";
 
 const VALID_ROLES = ["customer", "admin"];
 
@@ -111,6 +113,15 @@ export async function PUT(
       );
     }
 
+    await logAudit({
+      action: "user_role_change",
+      actor: authResult.user,
+      entity: "user",
+      entityId: result.rows[0].email,
+      details: { role: result.rows[0].role },
+      ip: clientIp(req),
+    });
+
     return NextResponse.json({
       success: true,
       message: "User updated successfully",
@@ -179,6 +190,14 @@ export async function DELETE(
     }
 
     await pool.query("DELETE FROM users WHERE id = $1", [id]);
+
+    await logAudit({
+      action: "user_delete",
+      actor: authResult.user,
+      entity: "user",
+      entityId: id,
+      ip: clientIp(req),
+    });
 
     return NextResponse.json({
       success: true,

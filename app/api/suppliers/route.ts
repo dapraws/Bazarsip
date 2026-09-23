@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
+import { clientIp } from "@/lib/request";
 import { normalizeWhatsapp } from "@/lib/whatsapp";
 
 // GET - Admin only. Suppliers are internal; customers never see them.
@@ -57,6 +59,15 @@ export async function POST(req: NextRequest) {
         notes || null,
       ],
     );
+
+    await logAudit({
+      action: "supplier_create",
+      actor: authResult.user,
+      entity: "supplier",
+      entityId: result.rows[0].id,
+      details: { name: result.rows[0].name },
+      ip: clientIp(req),
+    });
 
     return NextResponse.json(
       { success: true, data: result.rows[0] },

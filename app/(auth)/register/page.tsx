@@ -48,9 +48,7 @@ export default function RegisterPage() {
 
       if (loginRes.ok) {
         // Set session cookie
-        document.cookie = `session=${loginData.token}; path=/; max-age=${
-          7 * 24 * 60 * 60
-        }; SameSite=Lax`;
+        // The login response sets an httpOnly session cookie itself.
 
         // Redirect to dashboard
         router.push("/dashboard");

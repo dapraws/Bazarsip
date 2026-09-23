@@ -19,6 +19,8 @@ export async function middleware(request: NextRequest) {
     "/orders",
     "/products",
     "/suppliers",
+    "/audit",
+    "/security",
   ];
   // /shop is deliberately absent: the catalogue is the point of the site.
   // Customers arrive from a WhatsApp link, and requiring an account before
@@ -82,6 +84,8 @@ export const config = {
     "/orders/:path*",
     "/products/:path*",
     "/suppliers/:path*",
+    "/audit/:path*",
+    "/security/:path*",
 
     // Customer Routes
     "/checkout/:path*",

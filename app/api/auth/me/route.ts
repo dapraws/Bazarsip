@@ -26,7 +26,7 @@ export async function GET() {
     // The token carries id, email and role only. The name lives in the
     // database, and the profile page needs it.
     const result = await pool.query(
-      "SELECT id, name, email, role FROM users WHERE id = $1",
+      "SELECT id, name, email, role, totp_enabled FROM users WHERE id = $1",
       [decoded.userId],
     );
 

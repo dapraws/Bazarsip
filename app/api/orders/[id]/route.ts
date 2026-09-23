@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
+import { clientIp } from "@/lib/request";
 
 // Admins address orders by id; customers only ever by the public code.
 //
@@ -164,6 +166,15 @@ export async function PUT(
     `;
 
     const result = await pool.query(query, values);
+
+    await logAudit({
+      action: "order_status_change",
+      actor: authResult.user,
+      entity: "order",
+      entityId: result.rows[0].order_number,
+      details: { status, payment_status },
+      ip: clientIp(req),
+    });
 
     return NextResponse.json({
       success: true,

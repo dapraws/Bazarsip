@@ -12,6 +12,17 @@ export default function LoginPage() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  // Held between the password step and the code step. Not a session: it
+  // permits one thing, submitting a code, and expires in minutes.
+  const [challenge, setChallenge] = useState("");
+  const [code, setCode] = useState("");
+
+  // The server sets the session as an httpOnly cookie. Writing it from here
+  // would create a second copy that scripts can read, which is exactly what
+  // httpOnly prevents.
+  function goToLanding(role: string) {
+    window.location.href = role === "admin" ? "/dashboard" : "/shop";
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,20 +44,85 @@ export default function LoginPage() {
         return;
       }
 
-      document.cookie = `session=${loginData.token}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
-
-      await new Promise((resolve) => setTimeout(resolve, 200));
-
-      if (loginData.user.role === "admin") {
-        window.location.href = "/dashboard";
-      } else {
-        window.location.href = "/shop";
+      if (loginData.requires2fa) {
+        setChallenge(loginData.challenge);
+        setLoading(false);
+        return;
       }
-    } catch (err: any) {
-      console.error("Login error:", err);
+
+      goToLanding(loginData.user.role);
+    } catch {
       setError("Ada masalah. Coba lagi.");
       setLoading(false);
     }
+  }
+
+  async function handleVerify(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/auth/2fa/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ challenge, code }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Kode salah");
+        setLoading(false);
+        return;
+      }
+
+      goToLanding(data.user.role);
+    } catch {
+      setError("Ada masalah. Coba lagi.");
+      setLoading(false);
+    }
+  }
+
+  if (challenge) {
+    return (
+      <form onSubmit={handleVerify} className="space-y-4">
+        <h1 className="text-2xl font-bold text-center">Verifikasi</h1>
+        <p className="text-center text-sm text-gray-600">
+          Buka aplikasi authenticator di HP dan masukkan 6 angka yang tampil.
+        </p>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
+
+        <input
+          type="text"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          autoFocus
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          placeholder="000000"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-2xl tracking-[0.4em] focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        >
+          {loading ? "Memeriksa…" : "Lanjut"}
+        </button>
+
+        <p className="text-center text-xs text-gray-500">
+          HP hilang atau ganti? Masukkan salah satu kode cadangan di kolom yang
+          sama.
+        </p>
+      </form>
+    );
   }
 
   return (

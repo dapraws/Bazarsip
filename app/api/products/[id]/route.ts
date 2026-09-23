@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth, verifyAuth } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
+import { clientIp } from "@/lib/request";
 import { GENDERS, AGE_GROUPS, STYLES } from "@/lib/labels";
 
 // The CHECK constraints reject a bad value, but as a 500. Validating here
@@ -301,6 +303,14 @@ export async function DELETE(
 
     // Delete product
     await pool.query("DELETE FROM products WHERE id = $1", [id]);
+
+    await logAudit({
+      action: "product_delete",
+      actor: authResult.user,
+      entity: "product",
+      entityId: id,
+      ip: clientIp(req),
+    });
 
     return NextResponse.json({
       success: true,
