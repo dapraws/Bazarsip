@@ -1,6 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth, verifyAuth } from "@/lib/auth";
+import { GENDERS, AGE_GROUPS, STYLES } from "@/lib/labels";
+
+// The CHECK constraints reject a bad value, but as a 500. Validating here
+// turns that into an answer the caller can act on.
+const FACET_VALUES: Record<string, readonly string[]> = {
+  gender: GENDERS,
+  age_group: AGE_GROUPS,
+  style: STYLES,
+};
+
+function invalidFacet(facets: Record<string, unknown>): string | null {
+  for (const [field, value] of Object.entries(facets)) {
+    if (value === undefined || value === null || value === "") continue;
+    const allowed = FACET_VALUES[field];
+    if (allowed && !allowed.includes(String(value))) {
+      return `${field} harus salah satu dari: ${allowed.join(", ")}`;
+    }
+  }
+  return null;
+}
+
 
 // Public URLs address products and categories by slug; the admin UI still
 // links by id. slugify() never produces a purely numeric slug, so a numeric
@@ -94,6 +115,10 @@ export async function PUT(
       is_active,
       supplier_id,
       availability,
+      gender,
+      age_group,
+      style,
+      brand,
     } = body;
 
     // Check if product exists
@@ -172,6 +197,28 @@ export async function PUT(
       paramCount++;
       updates.push(`supplier_id = $${paramCount}`);
       values.push(supplier_id || null);
+    }
+
+    const facetError = invalidFacet({ gender, age_group, style });
+    if (facetError) {
+      return NextResponse.json(
+        { success: false, error: facetError },
+        { status: 400 },
+      );
+    }
+
+    // Clearing a facet is meaningful, so an empty string stores NULL rather
+    // than being ignored.
+    for (const [field, value] of [
+      ["gender", gender],
+      ["age_group", age_group],
+      ["style", style],
+      ["brand", brand],
+    ] as const) {
+      if (value === undefined) continue;
+      paramCount++;
+      updates.push(`${field} = $${paramCount}`);
+      values.push(typeof value === "string" ? value.trim() || null : null);
     }
 
     if (availability !== undefined) {

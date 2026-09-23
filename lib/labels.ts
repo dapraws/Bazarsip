@@ -29,3 +29,37 @@ export function orderStatusLabel(value: string) {
 export function paymentStatusLabel(value: string) {
   return PAYMENT_STATUS_LABELS[value] ?? value;
 }
+
+/**
+ * Product facets. Type lives in `categories`; these are the other axes a
+ * buyer browses by. All of them are optional on a product — the seller
+ * fills in what applies and leaves the rest.
+ */
+export const GENDERS = ["pria", "wanita", "unisex"] as const;
+export const AGE_GROUPS = ["dewasa", "remaja", "anak"] as const;
+export const STYLES = ["casual", "formal", "olahraga"] as const;
+
+export const GENDER_LABELS: Record<string, string> = {
+  pria: "Pria",
+  wanita: "Wanita",
+  unisex: "Unisex",
+};
+
+export const AGE_GROUP_LABELS: Record<string, string> = {
+  dewasa: "Dewasa",
+  remaja: "Remaja",
+  anak: "Anak",
+};
+
+export const STYLE_LABELS: Record<string, string> = {
+  casual: "Casual",
+  formal: "Formal",
+  olahraga: "Olahraga",
+};
+
+export function facetLabel(value: string | null | undefined) {
+  if (!value) return null;
+  return (
+    GENDER_LABELS[value] ?? AGE_GROUP_LABELS[value] ?? STYLE_LABELS[value] ?? value
+  );
+}

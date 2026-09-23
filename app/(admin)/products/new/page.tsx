@@ -4,6 +4,15 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/ui/ImageUpload";
 import { whatsappLink } from "@/lib/whatsapp";
+import FacetPicker from "@/components/admin/FacetPicker";
+import {
+  GENDERS,
+  AGE_GROUPS,
+  STYLES,
+  GENDER_LABELS,
+  AGE_GROUP_LABELS,
+  STYLE_LABELS,
+} from "@/lib/labels";
 
 interface Category {
   id: number;
@@ -33,6 +42,10 @@ export default function NewProductPage() {
     is_active: true,
     supplier_id: "",
     availability: "ready",
+    gender: "",
+    age_group: "",
+    style: "",
+    brand: "",
   });
 
   useEffect(() => {
@@ -87,6 +100,10 @@ export default function NewProductPage() {
             ? parseInt(formData.supplier_id)
             : null,
           availability: formData.availability,
+          gender: formData.gender,
+          age_group: formData.age_group,
+          style: formData.style,
+          brand: formData.brand,
         }),
       });
 
@@ -314,6 +331,52 @@ export default function NewProductPage() {
                   </span>
                 </label>
               ))}
+            </div>
+          </div>
+
+          {/* Browsing axes — all optional */}
+          <div className="space-y-5 rounded-lg border border-gray-200 p-4">
+            <FacetPicker
+              label="Untuk siapa"
+              options={GENDERS}
+              labels={GENDER_LABELS}
+              value={formData.gender}
+              onChange={(v) => setFormData({ ...formData, gender: v })}
+            />
+
+            <FacetPicker
+              label="Usia"
+              options={AGE_GROUPS}
+              labels={AGE_GROUP_LABELS}
+              value={formData.age_group}
+              onChange={(v) => setFormData({ ...formData, age_group: v })}
+            />
+
+            <FacetPicker
+              label="Gaya"
+              options={STYLES}
+              labels={STYLE_LABELS}
+              value={formData.style}
+              onChange={(v) => setFormData({ ...formData, style: v })}
+            />
+
+            <div>
+              <label
+                htmlFor="brand"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Merk
+              </label>
+              <input
+                id="brand"
+                type="text"
+                value={formData.brand}
+                onChange={(e) =>
+                  setFormData({ ...formData, brand: e.target.value })
+                }
+                placeholder="Nike, Eiger, atau kosongkan kalau tanpa merk"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
             </div>
           </div>
 

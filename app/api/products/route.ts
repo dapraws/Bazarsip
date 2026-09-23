@@ -2,6 +2,27 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth, verifyAuth } from "@/lib/auth";
 import { slugify, nextFreeSlug } from "@/lib/slug";
+import { GENDERS, AGE_GROUPS, STYLES } from "@/lib/labels";
+
+// The CHECK constraints reject a bad value, but as a 500. Validating here
+// turns that into an answer the caller can act on.
+const FACET_VALUES: Record<string, readonly string[]> = {
+  gender: GENDERS,
+  age_group: AGE_GROUPS,
+  style: STYLES,
+};
+
+function invalidFacet(facets: Record<string, unknown>): string | null {
+  for (const [field, value] of Object.entries(facets)) {
+    if (value === undefined || value === null || value === "") continue;
+    const allowed = FACET_VALUES[field];
+    if (allowed && !allowed.includes(String(value))) {
+      return `${field} harus salah satu dari: ${allowed.join(", ")}`;
+    }
+  }
+  return null;
+}
+
 
 // GET - Public route (no auth required)
 export async function GET(req: NextRequest) {
@@ -32,6 +53,47 @@ export async function GET(req: NextRequest) {
       values.push(categoryId);
     }
 
+    // Browsing axes. The column names are fixed here, never taken from the
+    // query string, and every value is still passed as a parameter.
+    for (const facet of ["gender", "age_group", "style"] as const) {
+      const value = searchParams.get(facet);
+      if (!value) continue;
+      paramCount++;
+      conditions.push(`p.${facet} = $${paramCount}`);
+      values.push(value);
+    }
+
+    const brand = searchParams.get("brand");
+    if (brand) {
+      paramCount++;
+      conditions.push(`p.brand ILIKE $${paramCount}`);
+      values.push(brand);
+    }
+
+    // The shop page has always sent these; nothing read them, so the price
+    // slider and the sort control did nothing.
+    const minPrice = searchParams.get("minPrice");
+    if (minPrice && !Number.isNaN(Number(minPrice))) {
+      paramCount++;
+      conditions.push(`p.price >= $${paramCount}`);
+      values.push(Number(minPrice));
+    }
+
+    const maxPrice = searchParams.get("maxPrice");
+    if (maxPrice && !Number.isNaN(Number(maxPrice))) {
+      paramCount++;
+      conditions.push(`p.price <= $${paramCount}`);
+      values.push(Number(maxPrice));
+    }
+
+    const ORDER_BY: Record<string, string> = {
+      newest: "p.created_at DESC",
+      price_asc: "p.price ASC",
+      price_desc: "p.price DESC",
+    };
+    const orderBy =
+      ORDER_BY[searchParams.get("sort") ?? "newest"] ?? ORDER_BY.newest;
+
     const whereClause = conditions.join(" AND ");
 
     // Get total count
@@ -56,7 +118,7 @@ export async function GET(req: NextRequest) {
       LEFT JOIN categories c ON p.category_id = c.id
       ${isAdmin ? "LEFT JOIN suppliers s ON p.supplier_id = s.id" : ""}
       WHERE ${whereClause}
-      ORDER BY p.created_at DESC
+      ORDER BY ${orderBy}
       LIMIT $${limitParam} OFFSET $${offsetParam}
     `;
 
@@ -110,11 +172,23 @@ export async function POST(req: NextRequest) {
       is_active,
       supplier_id,
       availability,
+      gender,
+      age_group,
+      style,
+      brand,
     } = body;
 
     if (!name) {
       return NextResponse.json(
         { success: false, error: "Product name is required" },
+        { status: 400 },
+      );
+    }
+
+    const facetError = invalidFacet({ gender, age_group, style });
+    if (facetError) {
+      return NextResponse.json(
+        { success: false, error: facetError },
         { status: 400 },
       );
     }
@@ -133,8 +207,8 @@ export async function POST(req: NextRequest) {
     );
 
     const result = await pool.query(
-      `INSERT INTO products (name, slug, description, price, stock, image_url, images, category_id, is_active, supplier_id, availability)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      `INSERT INTO products (name, slug, description, price, stock, image_url, images, category_id, is_active, supplier_id, availability, gender, age_group, style, brand)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
        RETURNING *`,
       [
         name,
@@ -148,6 +222,10 @@ export async function POST(req: NextRequest) {
         is_active !== undefined ? is_active : true,
         supplier_id || null,
         availability === "preorder" ? "preorder" : "ready",
+        gender || null,
+        age_group || null,
+        style || null,
+        brand?.trim() || null,
       ],
     );
 

@@ -58,6 +58,11 @@ CREATE TABLE products (
     -- SET NULL: removing a supplier must never remove their products.
     supplier_id INTEGER REFERENCES suppliers(id) ON DELETE SET NULL,
     availability VARCHAR(20) NOT NULL DEFAULT 'ready' CHECK (availability IN ('ready', 'preorder')),
+    -- Browsing axes, all optional: the seller fills in what applies.
+    gender VARCHAR(20) CHECK (gender IN ('pria', 'wanita', 'unisex')),
+    age_group VARCHAR(20) CHECK (age_group IN ('dewasa', 'remaja', 'anak')),
+    style VARCHAR(20) CHECK (style IN ('casual', 'formal', 'olahraga')),
+    brand VARCHAR(100), -- free text; brands are open-ended
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -116,6 +121,10 @@ CREATE TABLE order_items (
 CREATE INDEX idx_products_category_id ON products(category_id);
 CREATE INDEX idx_products_supplier ON products(supplier_id);
 CREATE INDEX idx_products_availability ON products(availability);
+CREATE INDEX idx_products_gender ON products(gender);
+CREATE INDEX idx_products_age_group ON products(age_group);
+CREATE INDEX idx_products_style ON products(style);
+CREATE INDEX idx_products_brand ON products(brand);
 CREATE INDEX idx_products_slug ON products(slug);
 CREATE INDEX idx_products_is_active ON products(is_active);
 CREATE INDEX idx_cart_items_cart_id ON cart_items(cart_id);
@@ -126,19 +135,16 @@ CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX idx_users_email ON users(email);
 
--- Starter categories, by item type.
---
--- The catalogue also varies by audience (anak / remaja / dewasa) and by
--- branded vs unbranded, but a product carries exactly one category, so those
--- axes need a separate field before they can be browsed on.
+-- Starter categories. Item type only — who a product is for, what age, what
+-- style and which brand are separate columns on products, so an item can be
+-- found through any of them rather than being filed under just one.
 INSERT INTO categories (name, slug, description) VALUES
 ('Sepatu',    'sepatu',    'Sepatu anak, remaja, dan dewasa'),
 ('Tas',       'tas',       'Tas sekolah, selempang, ransel, dan tas tangan'),
 ('Baju',      'baju',      'Atasan, kaos, kemeja, dan dress'),
 ('Celana',    'celana',    'Celana panjang, pendek, jeans, dan rok'),
-('Olahraga',  'olahraga',  'Perlengkapan dan pakaian olahraga'),
-('Formal',    'formal',    'Pakaian kerja dan acara resmi'),
-('Aksesoris', 'aksesoris', 'Topi, ikat pinggang, kaus kaki, dan lainnya');
+('Topi',      'topi',      'Topi dan penutup kepala'),
+('Aksesoris', 'aksesoris', 'Ikat pinggang, kaus kaki, dan lainnya');
 
 -- No seed users. Register the first account through /register, then promote
 -- it from psql:

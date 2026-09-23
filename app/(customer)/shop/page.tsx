@@ -3,6 +3,14 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { formatRupiah } from "@/lib/format";
+import {
+  GENDERS,
+  AGE_GROUPS,
+  STYLES,
+  GENDER_LABELS,
+  AGE_GROUP_LABELS,
+  STYLE_LABELS,
+} from "@/lib/labels";
 
 type Category = {
   id: number;
@@ -44,8 +52,15 @@ export default function ShopPage() {
   // query state
   const [search, setSearch] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
-  const [minPrice, setMinPrice] = useState<number>(200000);
-  const [maxPrice, setMaxPrice] = useState<number>(900000);
+  const [gender, setGender] = useState("");
+  const [ageGroup, setAgeGroup] = useState("");
+  const [style, setStyle] = useState("");
+  // The control is a single max-price slider, not a range. At the top of the
+  // scale it means "no limit" and the filter is not sent at all — otherwise
+  // the default would quietly hide everything cheaper than the starting
+  // value, which is most of the catalogue.
+  const PRICE_CEILING = 2_000_000;
+  const [maxPrice, setMaxPrice] = useState<number>(PRICE_CEILING);
   type SortOption = "price_asc" | "price_desc" | "newest";
   const [sort, setSort] = useState<SortOption>("newest");
 
@@ -74,8 +89,10 @@ export default function ShopPage() {
         params.set("limit", "12");
         if (search.trim()) params.set("search", search.trim());
         if (categoryId) params.set("categoryId", categoryId);
-        if (minPrice) params.set("minPrice", String(minPrice));
-        if (maxPrice) params.set("maxPrice", String(maxPrice));
+        if (gender) params.set("gender", gender);
+        if (ageGroup) params.set("age_group", ageGroup);
+        if (style) params.set("style", style);
+        if (maxPrice < PRICE_CEILING) params.set("maxPrice", String(maxPrice));
         params.set("sort", sort);
 
         const res = await fetch(`/api/products?${params.toString()}`, {
@@ -96,7 +113,7 @@ export default function ShopPage() {
         setLoading(false);
       }
     })();
-  }, [page, search, categoryId, minPrice, maxPrice, sort]);
+  }, [page, search, categoryId, gender, ageGroup, style, maxPrice, sort]);
 
   const pageButtons = useMemo(() => {
     // matches design: show left/right and some page numbers with ellipsis
@@ -196,15 +213,54 @@ export default function ShopPage() {
 
           <Divider />
 
+          <FilterChips
+            title="Untuk siapa"
+            options={GENDERS}
+            labels={GENDER_LABELS}
+            value={gender}
+            onChange={(v) => {
+              setGender(v);
+              setPage(1);
+            }}
+          />
+
+          <Divider />
+
+          <FilterChips
+            title="Usia"
+            options={AGE_GROUPS}
+            labels={AGE_GROUP_LABELS}
+            value={ageGroup}
+            onChange={(v) => {
+              setAgeGroup(v);
+              setPage(1);
+            }}
+          />
+
+          <Divider />
+
+          <FilterChips
+            title="Gaya"
+            options={STYLES}
+            labels={STYLE_LABELS}
+            value={style}
+            onChange={(v) => {
+              setStyle(v);
+              setPage(1);
+            }}
+          />
+
+          <Divider />
+
           <div className="py-3">
             <div className="flex items-center justify-between text-sm font-semibold">
-              Rentang Harga <span className="text-neutral-400">▾</span>
+              Harga Maksimal <span className="text-neutral-400">▾</span>
             </div>
             <div className="mt-3">
               <input
                 type="range"
                 min={0}
-                max={2000000}
+                max={PRICE_CEILING}
                 value={maxPrice}
                 onChange={(e) => {
                   setMaxPrice(Number(e.target.value));
@@ -213,8 +269,12 @@ export default function ShopPage() {
                 className="w-full"
               />
               <div className="mt-2 flex justify-between text-xs text-neutral-500">
-                <span>{formatRupiah(minPrice)}</span>
-                <span>{formatRupiah(maxPrice)}</span>
+                <span>Rp 0</span>
+                <span>
+                  {maxPrice >= PRICE_CEILING
+                    ? "Semua harga"
+                    : `sampai ${formatRupiah(maxPrice)}`}
+                </span>
               </div>
             </div>
           </div>
@@ -389,6 +449,49 @@ function Pagination({
       >
         ›
       </button>
+    </div>
+  );
+}
+
+/** Optional facet filter. Tapping the active chip clears it. */
+function FilterChips({
+  title,
+  options,
+  labels,
+  value,
+  onChange,
+}: {
+  title: string;
+  options: readonly string[];
+  labels: Record<string, string>;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="py-3">
+      <div className="flex items-center justify-between text-sm font-semibold">
+        {title}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {options.map((option) => {
+          const selected = value === option;
+          return (
+            <button
+              key={option}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => onChange(selected ? "" : option)}
+              className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                selected
+                  ? "border-neutral-900 bg-neutral-900 text-white"
+                  : "border-neutral-300 text-neutral-700 hover:bg-neutral-50"
+              }`}
+            >
+              {labels[option] ?? option}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

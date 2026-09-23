@@ -217,7 +217,7 @@ export default function ImageUpload({
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              <span className="text-xs mt-1">Add more</span>
+              <span className="text-xs mt-1">Tambah foto</span>
             </button>
           )}
         </div>
@@ -246,14 +246,14 @@ export default function ImageUpload({
               />
             </svg>
             <p className="mt-3 text-sm font-medium">
-              {multiple ? "Upload images" : "Upload image"}
+              {multiple ? "Unggah foto" : "Unggah foto"}
             </p>
             <p className="mt-1 text-xs">
               {multiple
-                ? "Click to browse or drag & drop multiple files"
-                : "Click to browse or drag & drop"}
+                ? "Ketuk untuk pilih banyak foto dari galeri"
+                : "Ketuk untuk pilih foto"}
             </p>
-            <p className="mt-1 text-xs">JPG, PNG, WebP up to 5MB</p>
+            <p className="mt-1 text-xs">JPG, PNG, atau WebP. Maksimal 5MB.</p>
           </div>
         </button>
       )}
