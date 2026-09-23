@@ -39,10 +39,9 @@ export async function middleware(request: NextRequest) {
     try {
       const secret = new TextEncoder().encode(process.env.JWT_SECRET);
       const { payload } = await jwtVerify(sessionToken, secret);
-      console.log("LOGGED ROLE:", payload.role);
       const decoded = payload as unknown as JWTPayload;
-      userRole = decoded.role; // Ensure this is exactly "admin" (lowercase) in your DB
-    } catch (error) {
+      userRole = decoded.role;
+    } catch {
       const response = NextResponse.redirect(new URL("/login", request.url));
       response.cookies.delete("session");
       return response;

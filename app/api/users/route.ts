@@ -26,7 +26,6 @@ export async function GET(req: NextRequest) {
       {
         success: false,
         error: "Failed to fetch users",
-        message: error.message,
       },
       { status: 500 },
     );

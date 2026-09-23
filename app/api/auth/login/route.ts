@@ -73,7 +73,6 @@ export async function POST(req: Request) {
       {
         success: false,
         error: "An error occurred during login",
-        message: error.message,
       },
       { status: 500 },
     );

@@ -26,7 +26,7 @@ export async function verifyAuth(request: NextRequest): Promise<{
       isValid: true,
       payload: payload as unknown as JWTPayload,
     };
-  } catch (error) {
+  } catch {
     return { isValid: false, error: "Invalid token" };
   }
 }

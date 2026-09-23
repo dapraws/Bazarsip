@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { UserError } from "@/lib/errors";
 
 // GET - Authenticated users only (customers see their own, admins see all)
 export async function GET(req: NextRequest) {
@@ -65,7 +66,6 @@ export async function GET(req: NextRequest) {
       {
         success: false,
         error: "Failed to fetch orders",
-        message: error.message,
       },
       { status: 500 },
     );
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
 
     // Validate items
     if (!items || items.length === 0) {
-      throw new Error("No items in order");
+      throw new UserError("No items in order");
     }
 
     // Get product details and check stock
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
       );
 
       if (productResult.rows.length === 0) {
-        throw new Error(`Product ${item.product_id} not available`);
+        throw new UserError(`Product ${item.product_id} not available`);
       }
 
       const product = productResult.rows[0];
@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
       );
 
       if (stockUpdate.rowCount === 0) {
-        throw new Error(`Insufficient stock for product ${item.product_id}`);
+        throw new UserError(`Insufficient stock for product ${item.product_id}`);
       }
     }
 
@@ -169,12 +169,19 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: any) {
     await client.query("ROLLBACK");
+
+    if (error instanceof UserError) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: error.status },
+      );
+    }
+
     console.error("Error creating order:", error);
     return NextResponse.json(
       {
         success: false,
         error: "Failed to create order",
-        message: error.message,
       },
       { status: 500 },
     );

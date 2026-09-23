@@ -25,7 +25,6 @@ export async function GET(req: NextRequest) {
       {
         success: false,
         error: "Failed to fetch categories",
-        message: error.message,
       },
       { status: 500 },
     );
@@ -87,7 +86,6 @@ export async function POST(req: NextRequest) {
       {
         success: false,
         error: "Failed to create category",
-        message: error.message,
       },
       { status: 500 },
     );

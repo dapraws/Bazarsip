@@ -35,7 +35,6 @@ export async function GET(
       {
         success: false,
         error: "Failed to fetch product",
-        message: error.message,
       },
       { status: 500 },
     );
@@ -174,7 +173,6 @@ export async function PUT(
       {
         success: false,
         error: "Failed to update product",
-        message: error.message,
       },
       { status: 500 },
     );
@@ -220,7 +218,6 @@ export async function DELETE(
       {
         success: false,
         error: "Failed to delete product",
-        message: error.message,
       },
       { status: 500 },
     );

@@ -71,7 +71,6 @@ export async function GET(req: NextRequest) {
       {
         success: false,
         error: "Failed to fetch products",
-        message: error.message,
       },
       { status: 500 },
     );
@@ -154,7 +153,6 @@ export async function POST(req: NextRequest) {
       {
         success: false,
         error: "Failed to create product",
-        message: error.message,
       },
       { status: 500 },
     );

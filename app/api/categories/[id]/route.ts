@@ -36,7 +36,6 @@ export async function GET(
       {
         success: false,
         error: "Failed to fetch category",
-        message: error.message,
       },
       { status: 500 },
     );
@@ -135,7 +134,6 @@ export async function PUT(
       {
         success: false,
         error: "Failed to update category",
-        message: error.message,
       },
       { status: 500 },
     );
@@ -182,7 +180,6 @@ export async function DELETE(
       {
         success: false,
         error: "Failed to delete category",
-        message: error.message,
       },
       { status: 500 },
     );

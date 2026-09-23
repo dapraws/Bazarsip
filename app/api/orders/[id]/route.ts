@@ -73,7 +73,6 @@ export async function GET(
       {
         success: false,
         error: "Failed to fetch order",
-        message: error.message,
       },
       { status: 500 },
     );
@@ -159,7 +158,6 @@ export async function PUT(
       {
         success: false,
         error: "Failed to update order",
-        message: error.message,
       },
       { status: 500 },
     );
