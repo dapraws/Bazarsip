@@ -1,4 +1,8 @@
 import { pool } from "@/lib/db";
+
+// These are live business figures. Without this the page is statically
+// rendered once at build time and keeps serving those numbers forever.
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { Suspense } from "react";
 import StatsCards from "@/components/admin/StatsCard";

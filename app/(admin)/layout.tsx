@@ -11,7 +11,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const router = useRouter();
 
   async function handleLogout() {
@@ -30,14 +30,13 @@ export default function AdminLayout({
         />
       </Suspense>
 
-      <div
-        className={`transition-all duration-300 ${isSidebarOpen ? "lg:ml-64" : "ml-0"}`}
-      >
+      <div className="transition-all duration-300 lg:ml-64">
         <header className="bg-white shadow-sm">
-          <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center justify-between px-4 sm:px-6 py-4">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 hover:text-gray-700 lg:hidden"
+              aria-label="Buka menu"
             >
               <svg
                 className="w-6 h-6"
@@ -66,7 +65,7 @@ export default function AdminLayout({
           </div>
         </header>
 
-        <main className="p-6">{children}</main>
+        <main className="p-4 sm:p-6">{children}</main>
       </div>
 
       {isSidebarOpen && (

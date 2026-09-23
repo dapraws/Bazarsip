@@ -113,14 +113,14 @@ export default function AdminCategoriesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-600 mt-1">Organize your products</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Categories</h1>
+          <p className="text-gray-600 mt-1 text-sm">Organize your products</p>
         </div>
         <button
           onClick={openCreateModal}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center space-x-2"
+          className="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2 shrink-0"
         >
           <svg
             className="w-5 h-5"
