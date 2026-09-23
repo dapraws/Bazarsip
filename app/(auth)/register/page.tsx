@@ -29,7 +29,7 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Registration failed");
+        setError(data.error || "Pendaftaran gagal");
         setLoading(false);
         return;
       }
@@ -61,14 +61,14 @@ export default function RegisterPage() {
       }
     } catch (err: any) {
       console.error("Registration error:", err);
-      setError("Something went wrong. Please try again.");
+      setError("Ada masalah. Coba lagi.");
       setLoading(false);
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="text-2xl font-bold text-center">Create Account</h1>
+      <h1 className="text-2xl font-bold text-center">Buat Akun</h1>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
@@ -81,12 +81,12 @@ export default function RegisterPage() {
           htmlFor="name"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Full Name
+          Nama Lengkap
         </label>
         <input
           id="name"
           type="text"
-          placeholder="Enter your full name"
+          placeholder="Nama lengkap"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -105,7 +105,7 @@ export default function RegisterPage() {
         <input
           id="email"
           type="email"
-          placeholder="Enter your email"
+          placeholder="nama@email.com"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -119,19 +119,19 @@ export default function RegisterPage() {
           htmlFor="password"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Password
+          Kata Sandi
         </label>
         <input
           id="password"
           type="password"
-          placeholder="Create a password (min 6 characters)"
+          placeholder="Minimal 8 karakter"
           value={formData.password}
           onChange={(e) =>
             setFormData({ ...formData, password: e.target.value })
           }
           className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
-          minLength={6}
+          minLength={8}
           disabled={loading}
         />
       </div>
@@ -141,16 +141,16 @@ export default function RegisterPage() {
         disabled={loading}
         className="w-full bg-black text-white py-3 rounded font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        {loading ? "Creating account..." : "Register"}
+        {loading ? "Mendaftar…" : "Daftar"}
       </button>
 
       <p className="text-sm text-center text-gray-600">
-        Already have an account?{" "}
+        Sudah punya akun?{" "}
         <Link
           href="/login"
           className="text-blue-600 hover:underline font-medium"
         >
-          Login here
+          Masuk di sini
         </Link>
       </p>
     </form>

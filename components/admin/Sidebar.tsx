@@ -35,7 +35,7 @@ export default function AdminSidebar({
       ),
     },
     {
-      name: "Products",
+      name: "Produk",
       href: "/products",
       icon: (
         <svg
@@ -54,7 +54,7 @@ export default function AdminSidebar({
       ),
     },
     {
-      name: "Categories",
+      name: "Kategori",
       href: "/categories",
       icon: (
         <svg
@@ -73,7 +73,7 @@ export default function AdminSidebar({
       ),
     },
     {
-      name: "Suppliers",
+      name: "Supplier",
       href: "/suppliers",
       icon: (
         <svg
@@ -92,7 +92,7 @@ export default function AdminSidebar({
       ),
     },
     {
-      name: "Orders",
+      name: "Pesanan",
       href: "/orders",
       icon: (
         <svg
@@ -111,7 +111,7 @@ export default function AdminSidebar({
       ),
     },
     {
-      name: "Users",
+      name: "Pengguna",
       href: "/users",
       icon: (
         <svg
@@ -138,7 +138,7 @@ export default function AdminSidebar({
       }`}
     >
       <div className="flex items-center justify-between h-16 px-6 bg-gray-800">
-        <h1 className="text-xl font-bold text-white">Bazarsip Admin</h1>
+        <h1 className="text-xl font-bold text-white">Bazarsip</h1>
         <button
           onClick={onClose}
           className="text-gray-400 hover:text-white lg:hidden"
@@ -198,7 +198,7 @@ export default function AdminSidebar({
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
             />
           </svg>
-          <span className="font-medium">Logout</span>
+          <span className="font-medium">Keluar</span>
         </button>
       </div>
     </aside>

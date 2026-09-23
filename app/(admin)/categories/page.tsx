@@ -78,18 +78,18 @@ export default function AdminCategoriesPage() {
         fetchCategories();
       } else {
         const data = await res.json();
-        alert(data.error || "Failed to save category");
+        alert(data.error || "Gagal menyimpan kategori");
       }
     } catch (error) {
       console.error("Error saving category:", error);
-      alert("Error saving category");
+      alert("Gagal menyimpan kategori");
     }
   }
 
   async function handleDelete(id: number) {
     if (
       !confirm(
-        "Are you sure? This will also delete all products in this category!",
+        "Hapus kategori ini? Semua produk di dalamnya ikut terhapus.",
       )
     ) {
       return;
@@ -99,14 +99,14 @@ export default function AdminCategoriesPage() {
       const res = await fetch(`/api/categories/${id}`, { method: "DELETE" });
 
       if (res.ok) {
-        alert("Category deleted successfully");
+        alert("Kategori dihapus");
         fetchCategories();
       } else {
-        alert("Failed to delete category");
+        alert("Gagal menghapus kategori");
       }
     } catch (error) {
       console.error("Error deleting category:", error);
-      alert("Error deleting category");
+      alert("Gagal menghapus kategori");
     }
   }
 
@@ -115,8 +115,8 @@ export default function AdminCategoriesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-600 mt-1 text-sm">Organize your products</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Kategori</h1>
+          <p className="text-gray-600 mt-1 text-sm">Kelompokkan barang dagangan</p>
         </div>
         <button
           onClick={openCreateModal}
@@ -135,7 +135,7 @@ export default function AdminCategoriesPage() {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          <span>Add Category</span>
+          <span>Tambah Kategori</span>
         </button>
       </div>
 
@@ -143,7 +143,7 @@ export default function AdminCategoriesPage() {
       {loading ? (
         <div className="p-12 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading categories...</p>
+          <p className="mt-4 text-gray-600">Memuat kategori…</p>
         </div>
       ) : categories.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
@@ -160,9 +160,9 @@ export default function AdminCategoriesPage() {
               d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
             />
           </svg>
-          <p className="mt-4 text-gray-600 font-medium">No categories yet</p>
+          <p className="mt-4 text-gray-600 font-medium">Belum ada kategori</p>
           <p className="text-sm text-gray-500 mt-1">
-            Create your first category to organize products
+            Buat kategori pertama untuk mengelompokkan barang
           </p>
         </div>
       ) : (
@@ -207,8 +207,7 @@ export default function AdminCategoriesPage() {
                 )}
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">
-                    {category.product_count} product
-                    {category.product_count !== 1 ? "s" : ""}
+                    {category.product_count} produk
                   </span>
                   <div className="flex items-center space-x-2">
                     <button
@@ -262,14 +261,14 @@ export default function AdminCategoriesPage() {
             <form onSubmit={handleSubmit}>
               <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-xl font-bold text-gray-900">
-                  {editingCategory ? "Edit Category" : "Create Category"}
+                  {editingCategory ? "Ubah Kategori" : "Tambah Kategori"}
                 </h2>
               </div>
 
               <div className="p-6 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category Name *
+                    Nama Kategori *
                   </label>
                   <input
                     type="text"
@@ -278,14 +277,14 @@ export default function AdminCategoriesPage() {
                       setFormData({ ...formData, name: e.target.value })
                     }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter category name"
+                    placeholder="Sepatu"
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
+                    Deskripsi
                   </label>
                   <textarea
                     value={formData.description}
@@ -297,15 +296,15 @@ export default function AdminCategoriesPage() {
                     }
                     rows={3}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter description"
+                    placeholder="Sepatu anak, remaja, dan dewasa"
                   />
                 </div>
 
                 {/* Category Image — Cloudinary Upload */}
                 <ImageUpload
                   folder="bazarsip/categories"
-                  label="Category Image"
-                  hint="Recommended: 800×480px or wider."
+                  label="Foto Kategori"
+                  hint="Disarankan 800×480px atau lebih lebar."
                   value={formData.image_url}
                   onChange={(val) =>
                     setFormData({ ...formData, image_url: val as string })
@@ -320,13 +319,13 @@ export default function AdminCategoriesPage() {
                   onClick={() => setShowModal(false)}
                   className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
                 >
-                  Cancel
+                  Batal
                 </button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  {editingCategory ? "Save Changes" : "Create Category"}
+                  {editingCategory ? "Simpan Perubahan" : "Simpan"}
                 </button>
               </div>
             </form>

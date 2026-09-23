@@ -17,7 +17,7 @@ export default function ProductSearch({
         <div className="flex-1">
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Cari produk…"
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -35,7 +35,7 @@ export default function ProductSearch({
           onClick={onSearch}
           className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
         >
-          Search
+          Cari
         </button>
       </div>
     </div>

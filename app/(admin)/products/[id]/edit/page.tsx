@@ -159,7 +159,7 @@ export default function EditProductPage({ params }: PageProps) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading product...</p>
+          <p className="mt-4 text-gray-600">Memuat produk…</p>
         </div>
       </div>
     );
@@ -168,8 +168,8 @@ export default function EditProductPage({ params }: PageProps) {
   return (
     <div className="max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Edit Product</h1>
-        <p className="text-gray-600 mt-1">Update product information</p>
+        <h1 className="text-3xl font-bold text-gray-900">Ubah Produk</h1>
+        <p className="text-gray-600 mt-1">Perbarui data barang</p>
       </div>
 
       <form
@@ -189,7 +189,7 @@ export default function EditProductPage({ params }: PageProps) {
               htmlFor="name"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Product Name *
+              Nama Produk *
             </label>
             <input
               type="text"
@@ -199,7 +199,7 @@ export default function EditProductPage({ params }: PageProps) {
                 setFormData({ ...formData, name: e.target.value })
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter product name"
+              placeholder="Kaos polos lengan pendek"
               required
             />
           </div>
@@ -210,7 +210,7 @@ export default function EditProductPage({ params }: PageProps) {
               htmlFor="description"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Description
+              Deskripsi
             </label>
             <textarea
               id="description"
@@ -220,7 +220,7 @@ export default function EditProductPage({ params }: PageProps) {
               }
               rows={4}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter product description"
+              placeholder="Bahan, ukuran, warna yang tersedia…"
             />
           </div>
 
@@ -231,7 +231,7 @@ export default function EditProductPage({ params }: PageProps) {
                 htmlFor="price"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Price (Rp) *
+                Harga (Rp) *
               </label>
               <input
                 type="number"
@@ -253,7 +253,7 @@ export default function EditProductPage({ params }: PageProps) {
                 htmlFor="stock"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                Stock *
+                Jumlah Stok *
               </label>
               <input
                 type="number"
@@ -276,7 +276,7 @@ export default function EditProductPage({ params }: PageProps) {
               htmlFor="category"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
-              Category *
+              Kategori *
             </label>
             <select
               id="category"
@@ -287,7 +287,7 @@ export default function EditProductPage({ params }: PageProps) {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             >
-              <option value="">Select a category</option>
+              <option value="">Pilih kategori</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -377,8 +377,8 @@ export default function EditProductPage({ params }: PageProps) {
           {/* Main Image — Cloudinary Upload */}
           <ImageUpload
             folder="bazarsip/products"
-            label="Main Image"
-            hint="This image will be shown as the product thumbnail."
+            label="Foto Utama"
+            hint="Foto ini yang tampil di daftar produk."
             value={formData.image_url}
             onChange={(val) =>
               setFormData({ ...formData, image_url: val as string })
@@ -389,8 +389,8 @@ export default function EditProductPage({ params }: PageProps) {
           {/* Gallery Images — Cloudinary Upload */}
           <ImageUpload
             folder="bazarsip/products"
-            label="Gallery Images"
-            hint="First image is the main display. Drag & drop or click to add multiple images."
+            label="Foto Lainnya"
+            hint="Bisa pilih banyak foto sekaligus dari galeri HP."
             value={formData.images}
             onChange={(val) =>
               setFormData({ ...formData, images: val as string[] })
@@ -413,7 +413,7 @@ export default function EditProductPage({ params }: PageProps) {
               htmlFor="is_active"
               className="ml-2 text-sm font-medium text-gray-700"
             >
-              Active (visible to customers)
+              Tampilkan ke pelanggan
             </label>
           </div>
         </div>
@@ -425,14 +425,14 @@ export default function EditProductPage({ params }: PageProps) {
             onClick={() => router.back()}
             className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
           >
-            Cancel
+            Batal
           </button>
           <button
             type="submit"
             disabled={saving}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? "Menyimpan…" : "Simpan Perubahan"}
           </button>
         </div>
       </form>

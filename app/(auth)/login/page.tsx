@@ -28,7 +28,7 @@ export default function LoginPage() {
       const loginData = await res.json();
 
       if (!res.ok) {
-        setError(loginData.error || "Login failed");
+        setError(loginData.error || "Email atau kata sandi salah");
         setLoading(false);
         return;
       }
@@ -44,14 +44,14 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       console.error("Login error:", err);
-      setError("Something went wrong. Please try again.");
+      setError("Ada masalah. Coba lagi.");
       setLoading(false);
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h1 className="text-2xl font-bold text-center">Login to Bazarsip</h1>
+      <h1 className="text-2xl font-bold text-center">Masuk ke Bazarsip</h1>
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
@@ -69,7 +69,7 @@ export default function LoginPage() {
         <input
           id="email"
           type="email"
-          placeholder="Enter your email"
+          placeholder="nama@email.com"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className="w-full border border-gray-300 p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -83,12 +83,12 @@ export default function LoginPage() {
           htmlFor="password"
           className="block text-sm font-medium text-gray-700 mb-1"
         >
-          Password
+          Kata Sandi
         </label>
         <input
           id="password"
           type="password"
-          placeholder="Enter your password"
+          placeholder="Kata sandi"
           value={formData.password}
           onChange={(e) =>
             setFormData({ ...formData, password: e.target.value })
@@ -104,16 +104,16 @@ export default function LoginPage() {
         disabled={loading}
         className="w-full bg-black text-white py-3 rounded font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        {loading ? "Logging in..." : "Login"}
+        {loading ? "Masuk…" : "Masuk"}
       </button>
 
       <p className="text-sm text-center text-gray-600">
-        Don't have an account?{" "}
+        Belum punya akun?{" "}
         <Link
           href="/register"
           className="text-blue-600 hover:underline font-medium"
         >
-          Register here
+          Daftar di sini
         </Link>
       </p>
 

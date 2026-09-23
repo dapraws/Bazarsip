@@ -3,6 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatRupiah } from "@/lib/format";
+import {
+  ORDER_STATUSES,
+  orderStatusLabel,
+  paymentStatusLabel,
+} from "@/lib/labels";
 
 interface Order {
   id: number;
@@ -60,7 +65,7 @@ export default function AdminOrdersPage() {
       }
     } catch (error) {
       console.error("Error updating order:", error);
-      alert("Error updating order");
+      alert("Gagal memperbarui pesanan");
     }
   }
 
@@ -86,15 +91,7 @@ export default function AdminOrdersPage() {
       {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
         <div className="flex items-center space-x-2 overflow-x-auto">
-          {[
-            "all",
-            "pending",
-            "paid",
-            "processing",
-            "shipped",
-            "delivered",
-            "cancelled",
-          ].map((status) => (
+          {["all", ...ORDER_STATUSES].map((status) => (
             <button
               key={status}
               onClick={() => setFilter(status)}
@@ -104,7 +101,7 @@ export default function AdminOrdersPage() {
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              {status.charAt(0).toUpperCase() + status.slice(1)}
+              {status === "all" ? "Semua" : orderStatusLabel(status)}
             </button>
           ))}
         </div>
@@ -115,7 +112,7 @@ export default function AdminOrdersPage() {
         {loading ? (
           <div className="p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading orders...</p>
+            <p className="mt-4 text-gray-600">Memuat pesanan…</p>
           </div>
         ) : orders.length === 0 ? (
           <div className="p-12 text-center">
@@ -132,7 +129,7 @@ export default function AdminOrdersPage() {
                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
               />
             </svg>
-            <p className="mt-4 text-gray-600 font-medium">No orders found</p>
+            <p className="mt-4 text-gray-600 font-medium">Belum ada pesanan</p>
             <p className="text-sm text-gray-500 mt-1">
               Orders will appear here when customers make purchases
             </p>
@@ -182,7 +179,7 @@ export default function AdminOrdersPage() {
                             : "bg-yellow-100 text-yellow-800"
                       }`}
                     >
-                      {order.payment_status}
+                      {paymentStatusLabel(order.payment_status)}
                     </span>
                   </div>
 
@@ -193,12 +190,12 @@ export default function AdminOrdersPage() {
                     }
                     className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white"
                   >
-                    <option value="pending">Pending</option>
-                    <option value="paid">Paid</option>
-                    <option value="processing">Processing</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
+                    <option value="pending">Menunggu</option>
+                    <option value="paid">Dibayar</option>
+                    <option value="processing">Diproses</option>
+                    <option value="shipped">Dikirim</option>
+                    <option value="delivered">Sampai</option>
+                    <option value="cancelled">Dibatalkan</option>
                   </select>
                 </li>
               ))}
@@ -209,10 +206,10 @@ export default function AdminOrdersPage() {
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Order ID
+                    No. Pesanan
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer
+                    Pelanggan
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Total
@@ -221,13 +218,13 @@ export default function AdminOrdersPage() {
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Payment
+                    Pembayaran
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
+                    Tanggal
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                    Aksi
                   </th>
                 </tr>
               </thead>
@@ -266,12 +263,12 @@ export default function AdminOrdersPage() {
                           "bg-gray-100 text-gray-800"
                         }`}
                       >
-                        <option value="pending">Pending</option>
-                        <option value="paid">Paid</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="pending">Menunggu</option>
+                        <option value="paid">Dibayar</option>
+                        <option value="processing">Diproses</option>
+                        <option value="shipped">Dikirim</option>
+                        <option value="delivered">Sampai</option>
+                        <option value="cancelled">Dibatalkan</option>
                       </select>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -284,7 +281,7 @@ export default function AdminOrdersPage() {
                               : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
-                        {order.payment_status}
+                        {paymentStatusLabel(order.payment_status)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -299,7 +296,7 @@ export default function AdminOrdersPage() {
                         href={`/orders/${order.id}`}
                         className="text-blue-600 hover:text-blue-900"
                       >
-                        View Details
+                        Lihat detail
                       </Link>
                     </td>
                   </tr>

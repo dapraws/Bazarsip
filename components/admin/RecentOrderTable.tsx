@@ -19,7 +19,7 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
     return (
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
         <div className="px-6 py-4 border-b flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
+          <h2 className="text-xl font-bold text-gray-900">Pesanan Terbaru</h2>
         </div>
         <div className="p-8 text-center text-gray-500">
           <svg
@@ -35,7 +35,7 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
               d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
             />
           </svg>
-          <p className="font-medium">No orders yet</p>
+          <p className="font-medium">Belum ada pesanan</p>
         </div>
       </div>
     );
@@ -44,7 +44,7 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
       <div className="px-6 py-4 border-b flex items-center justify-between">
-        <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
+        <h2 className="text-xl font-bold text-gray-900">Pesanan Terbaru</h2>
         <Link
           href="/orders"
           className="text-sm text-blue-600 hover:text-blue-700 font-medium"
@@ -57,10 +57,10 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Order ID
+                No. Pesanan
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Customer
+                Pelanggan
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Total
@@ -69,7 +69,7 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                 Status
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Date
+                Tanggal
               </th>
             </tr>
           </thead>

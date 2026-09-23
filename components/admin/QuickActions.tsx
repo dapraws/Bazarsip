@@ -4,8 +4,8 @@ import Link from "next/link";
 export default function QuickActions() {
   const quickActions = [
     {
-      title: "Add New Product",
-      description: "Create a new product listing",
+      title: "Tambah Produk",
+      description: "Masukkan barang baru ke etalase",
       href: "/products/new",
       icon: (
         <svg
@@ -25,8 +25,8 @@ export default function QuickActions() {
       color: "bg-blue-600 hover:bg-blue-700",
     },
     {
-      title: "View All Orders",
-      description: "Manage customer orders",
+      title: "Lihat Semua Pesanan",
+      description: "Lihat dan proses pesanan masuk",
       href: "/orders",
       icon: (
         <svg
@@ -46,8 +46,8 @@ export default function QuickActions() {
       color: "bg-green-600 hover:bg-green-700",
     },
     {
-      title: "Manage Categories",
-      description: "Organize product categories",
+      title: "Kelola Kategori",
+      description: "Atur pengelompokan barang",
       href: "/categories",
       icon: (
         <svg
@@ -67,8 +67,8 @@ export default function QuickActions() {
       color: "bg-purple-600 hover:bg-purple-700",
     },
     {
-      title: "User Management",
-      description: "Manage customer accounts",
+      title: "Kelola Pengguna",
+      description: "Kelola akun pelanggan dan admin",
       href: "/users",
       icon: (
         <svg
@@ -91,7 +91,7 @@ export default function QuickActions() {
 
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-4">Aksi Cepat</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {quickActions.map((action) => (
           <Link

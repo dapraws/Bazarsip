@@ -48,12 +48,12 @@ export default function AdminProductsPage() {
   }
 
   async function handleDelete(id: number) {
-    if (!confirm("Are you sure you want to delete this product?")) return;
+    if (!confirm("Hapus produk ini?")) return;
 
     try {
       const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
       if (res.ok) {
-        alert("Product deleted successfully");
+        alert("Produk dihapus");
         fetchProducts();
       }
     } catch (error) {
@@ -65,8 +65,8 @@ export default function AdminProductsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Products</h1>
-          <p className="text-gray-600 mt-1 text-sm">Manage your product inventory</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Produk</h1>
+          <p className="text-gray-600 mt-1 text-sm">Kelola barang dagangan</p>
         </div>
         <Link
           href="/products/new"
@@ -85,7 +85,7 @@ export default function AdminProductsPage() {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          <span>Add Product</span>
+          <span>Tambah Produk</span>
         </Link>
       </div>
 

@@ -51,18 +51,18 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Users</h1>
-        <p className="text-gray-600 mt-1">Manage user accounts</p>
+        <h1 className="text-3xl font-bold text-gray-900">Pengguna</h1>
+        <p className="text-gray-600 mt-1">Kelola akun pelanggan dan admin</p>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
         {loading ? (
           <div className="p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading users...</p>
+            <p className="mt-4 text-gray-600">Memuat pengguna…</p>
           </div>
         ) : users.length === 0 ? (
-          <div className="p-12 text-center text-gray-600">No users found</div>
+          <div className="p-12 text-center text-gray-600">Belum ada pengguna</div>
         ) : (
           <>
             {/* Phone: stacked cards; the six-column table has no room. */}
@@ -110,19 +110,19 @@ export default function AdminUsersPage() {
                   ID
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Name
+                  Nama
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Email
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Role
+                  Peran
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Created
+                  Bergabung
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                  Actions
+                  Aksi
                 </th>
               </tr>
             </thead>
@@ -153,7 +153,7 @@ export default function AdminUsersPage() {
                       onClick={() => toggleUserRole(user.id, user.role)}
                       className="text-blue-600 hover:text-blue-800 text-sm font-medium"
                     >
-                      Toggle Role
+                      Ubah peran
                     </button>
                   </td>
                 </tr>

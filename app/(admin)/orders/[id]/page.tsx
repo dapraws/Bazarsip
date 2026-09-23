@@ -53,14 +53,14 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
       });
 
       if (res.ok) {
-        alert("Order status updated!");
+        alert("Status pesanan diperbarui");
         fetchOrder();
       } else {
-        alert("Failed to update order status");
+        alert("Gagal memperbarui status pesanan");
       }
     } catch (error) {
       console.error("Error updating order:", error);
-      alert("Error updating order");
+      alert("Gagal memperbarui pesanan");
     } finally {
       setUpdating(false);
     }
@@ -76,14 +76,14 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
       });
 
       if (res.ok) {
-        alert("Payment status updated!");
+        alert("Status pembayaran diperbarui");
         fetchOrder();
       } else {
-        alert("Failed to update payment status");
+        alert("Gagal memperbarui status pembayaran");
       }
     } catch (error) {
       console.error("Error updating payment:", error);
-      alert("Error updating payment");
+      alert("Gagal memperbarui pembayaran");
     } finally {
       setUpdating(false);
     }
@@ -94,7 +94,7 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading order...</p>
+          <p className="mt-4 text-gray-600">Memuat pesanan…</p>
         </div>
       </div>
     );
@@ -103,12 +103,12 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
   if (!order) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">Order not found</p>
+        <p className="text-gray-600">Pesanan tidak ditemukan</p>
         <Link
           href="/orders"
           className="text-blue-600 hover:underline mt-2 inline-block"
         >
-          Back to Orders
+          Kembali ke Pesanan
         </Link>
       </div>
     );
@@ -139,7 +139,7 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
             href="/orders"
             className="text-blue-600 hover:text-blue-800 font-medium mb-2 inline-block"
           >
-            ← Back to Orders
+            ← Kembali ke Pesanan
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">
             {order.order_number}
@@ -163,7 +163,7 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
           {/* Order Items */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100">
             <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900">Order Items</h2>
+              <h2 className="text-xl font-bold text-gray-900">Isi Pesanan</h2>
             </div>
             <div className="p-6">
               <div className="space-y-4">
@@ -184,7 +184,7 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
                         {item.product_name}
                       </h3>
                       <p className="text-sm text-gray-600 mt-1">
-                        Quantity: {item.quantity} × {formatRupiah(item.price)}
+                        Jumlah: {item.quantity} × {formatRupiah(item.price)}
                       </p>
                     </div>
                     <div className="text-right">
@@ -213,14 +213,14 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100">
             <div className="px-6 py-4 border-b border-gray-100">
               <h2 className="text-xl font-bold text-gray-900">
-                Shipping Information
+                Info Pengiriman
               </h2>
             </div>
             <div className="p-6">
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-gray-700">
-                    Shipping Address
+                    Alamat Pengiriman
                   </label>
                   <p className="mt-1 text-gray-900">
                     {order.shipping_address || "No address provided"}
@@ -230,7 +230,7 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
                 {order.notes && (
                   <div>
                     <label className="text-sm font-medium text-gray-700">
-                      Order Notes
+                      Catatan Pesanan
                     </label>
                     <p className="mt-1 text-gray-900">{order.notes}</p>
                   </div>
@@ -245,7 +245,7 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
           {/* Customer Info */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100">
             <div className="px-6 py-4 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-900">Customer</h2>
+              <h2 className="text-xl font-bold text-gray-900">Pelanggan</h2>
             </div>
             <div className="p-6">
               <div className="space-y-2">
@@ -273,7 +273,7 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Order Status
+                  Status Pesanan
                 </label>
                 <select
                   value={order.status}
@@ -283,18 +283,18 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
                     statusColors[order.status] || "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  <option value="pending">Pending</option>
-                  <option value="paid">Paid</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
+                  <option value="pending">Menunggu</option>
+                  <option value="paid">Dibayar</option>
+                  <option value="processing">Diproses</option>
+                  <option value="shipped">Dikirim</option>
+                  <option value="delivered">Sampai</option>
+                  <option value="cancelled">Dibatalkan</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Payment Status
+                  Status Pembayaran
                 </label>
                 <select
                   value={order.payment_status}
@@ -305,10 +305,10 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
                     "bg-gray-100 text-gray-800"
                   }`}
                 >
-                  <option value="unpaid">Unpaid</option>
-                  <option value="paid">Paid</option>
-                  <option value="failed">Failed</option>
-                  <option value="refunded">Refunded</option>
+                  <option value="unpaid">Belum bayar</option>
+                  <option value="paid">Lunas</option>
+                  <option value="failed">Gagal</option>
+                  <option value="refunded">Dikembalikan</option>
                 </select>
               </div>
             </div>

@@ -12,7 +12,7 @@ interface StatsCardsProps {
 export default function StatsCards({ stats }: StatsCardsProps) {
   const statCards = [
     {
-      title: "Total Revenue",
+      title: "Total Pemasukan",
       value: formatRupiah(stats.totalRevenue),
       icon: (
         <svg
@@ -33,7 +33,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       textColor: "text-green-600",
     },
     {
-      title: "Total Orders",
+      title: "Total Pesanan",
       value: stats.totalOrders,
       icon: (
         <svg
@@ -54,7 +54,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       textColor: "text-blue-600",
     },
     {
-      title: "Total Products",
+      title: "Total Produk",
       value: stats.totalProducts,
       icon: (
         <svg
@@ -75,7 +75,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       textColor: "text-purple-600",
     },
     {
-      title: "Total Customers",
+      title: "Total Pelanggan",
       value: stats.totalCustomers,
       icon: (
         <svg
