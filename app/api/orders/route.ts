@@ -106,19 +106,15 @@ export async function POST(req: NextRequest) {
 
     for (const item of items) {
       const productResult = await client.query(
-        "SELECT id, price, stock FROM products WHERE id = $1",
+        "SELECT id, price, stock FROM products WHERE id = $1 AND is_active = true",
         [item.product_id],
       );
 
       if (productResult.rows.length === 0) {
-        throw new Error(`Product ${item.product_id} not found`);
+        throw new Error(`Product ${item.product_id} not available`);
       }
 
       const product = productResult.rows[0];
-
-      if (product.stock < item.quantity) {
-        throw new Error(`Insufficient stock for product ${item.product_id}`);
-      }
 
       const subtotal = product.price * item.quantity;
       total += subtotal;
@@ -148,10 +144,17 @@ export async function POST(req: NextRequest) {
         [orderId, item.product_id, item.price, item.quantity],
       );
 
-      await client.query(
-        `UPDATE products SET stock = stock - $1 WHERE id = $2`,
+      // Guard the decrement itself: checking stock in a separate SELECT
+      // leaves a window where a concurrent order can take the same units
+      // and drive stock negative.
+      const stockUpdate = await client.query(
+        `UPDATE products SET stock = stock - $1 WHERE id = $2 AND stock >= $1`,
         [item.quantity, item.product_id],
       );
+
+      if (stockUpdate.rowCount === 0) {
+        throw new Error(`Insufficient stock for product ${item.product_id}`);
+      }
     }
 
     await client.query("COMMIT");
