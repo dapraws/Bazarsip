@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatRupiah } from "@/lib/format";
+import { orderStatusLabel } from "@/lib/labels";
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -40,21 +41,21 @@ export default function MyOrdersPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Orders</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Pesanan Saya</h1>
 
         {loading ? (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading orders...</p>
+            <p className="mt-4 text-gray-600">Memuat pesanan…</p>
           </div>
         ) : orders.length === 0 ? (
           <div className="bg-white rounded-xl shadow-sm border p-12 text-center">
-            <p className="text-gray-600">No orders yet</p>
+            <p className="text-gray-600">Belum ada pesanan</p>
             <Link
               href="/shop"
               className="text-blue-600 hover:underline mt-2 inline-block"
             >
-              Start Shopping
+              Mulai Belanja
             </Link>
           </div>
         ) : (
@@ -76,7 +77,7 @@ export default function MyOrdersPage() {
                   <span
                     className={`px-3 py-1 text-xs font-semibold rounded-full ${statusColors[order.status]}`}
                   >
-                    {order.status}
+                    {orderStatusLabel(order.status)}
                   </span>
                 </div>
 

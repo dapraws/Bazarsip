@@ -122,12 +122,12 @@ export default function CartPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
+          <h2 className="text-2xl font-bold mb-4">Keranjang masih kosong</h2>
           <Link
             href="/shop"
             className="bg-blue-600 text-white px-8 py-3 rounded-lg inline-block hover:bg-blue-700"
           >
-            Start Shopping
+            Mulai Belanja
           </Link>
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
+        <h1 className="text-3xl font-bold mb-8">Keranjang</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
@@ -157,7 +157,7 @@ export default function CartPage() {
 
                 <div className="flex-1">
                   <h3 className="font-semibold">
-                    {item.product?.name ?? "Product unavailable"}
+                    {item.product?.name ?? "Barang tidak tersedia"}
                   </h3>
                   <p className="text-gray-600">
                     {formatRupiah(item.product?.price)}
@@ -170,7 +170,7 @@ export default function CartPage() {
                       updateQuantity(item.productId, item.quantity - 1)
                     }
                     className="w-8 h-8 border rounded hover:bg-gray-100"
-                    aria-label="Decrease quantity"
+                    aria-label="Kurangi jumlah"
                   >
                     -
                   </button>
@@ -180,7 +180,7 @@ export default function CartPage() {
                       updateQuantity(item.productId, item.quantity + 1)
                     }
                     className="w-8 h-8 border rounded hover:bg-gray-100"
-                    aria-label="Increase quantity"
+                    aria-label="Tambah jumlah"
                   >
                     +
                   </button>
@@ -196,7 +196,7 @@ export default function CartPage() {
                     onClick={() => removeItem(item.productId)}
                     className="text-red-600 text-sm mt-2"
                   >
-                    Remove
+                    Hapus
                   </button>
                 </div>
               </div>
@@ -205,7 +205,7 @@ export default function CartPage() {
 
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border p-6 sticky top-24">
-              <h2 className="text-xl font-bold mb-6">Order Summary</h2>
+              <h2 className="text-xl font-bold mb-6">Ringkasan</h2>
               <div className="space-y-4">
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
@@ -220,7 +220,7 @@ export default function CartPage() {
                 onClick={() => router.push("/checkout")}
                 className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
               >
-                Proceed to Checkout
+                Lanjut ke Pembayaran
               </button>
             </div>
           </div>

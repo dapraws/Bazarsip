@@ -5,8 +5,8 @@ import ImageUpload from "@/components/ui/ImageUpload";
 
 export default function ProfilePage() {
   const [formData, setFormData] = useState({
-    name: "John Doe",
-    email: "customer@bazarsip.com",
+    name: "",
+    email: "",
     avatar_url: "",
     current_password: "",
     new_password: "",
@@ -15,19 +15,39 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    async function loadUser() {
+      try {
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+        if (data.success) {
+          setFormData((prev) => ({
+            ...prev,
+            name: data.user.name ?? "",
+            email: data.user.email ?? "",
+          }));
+        }
+      } catch {
+        // Leave the fields blank rather than showing someone else's details.
+      }
+    }
+    loadUser();
+  }, []);
+
   async function handleUpdateProfile(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    // TODO: wire up to /api/users/:id
-    await new Promise((r) => setTimeout(r, 600));
-    setMessage("Profile update coming soon!");
+    // Editing is not wired up yet: updating a user is admin-only, so this
+    // needs an endpoint a customer is allowed to call.
+    await new Promise((r) => setTimeout(r, 300));
+    setMessage("Ubah profil belum tersedia. Hubungi penjual untuk perubahan.");
     setSaving(false);
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Profile</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Profil Saya</h1>
 
         <form
           onSubmit={handleUpdateProfile}
@@ -45,7 +65,7 @@ export default function ProfilePage() {
               {formData.avatar_url ? (
                 <img
                   src={formData.avatar_url}
-                  alt="Avatar"
+                  alt="Foto profil"
                   className="w-20 h-20 rounded-full object-cover border-4 border-white shadow"
                 />
               ) : (
@@ -57,8 +77,8 @@ export default function ProfilePage() {
             <div className="flex-1">
               <ImageUpload
                 folder="bazarsip/users"
-                label="Profile Photo"
-                hint="JPG, PNG or WebP. Max 5MB."
+                label="Foto Profil"
+                hint="JPG, PNG, atau WebP. Maksimal 5MB."
                 value={formData.avatar_url}
                 onChange={(val) =>
                   setFormData({ ...formData, avatar_url: val as string })
@@ -71,7 +91,7 @@ export default function ProfilePage() {
           {/* Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Full Name
+              Nama Lengkap
             </label>
             <input
               type="text"
@@ -101,13 +121,13 @@ export default function ProfilePage() {
           {/* Change Password */}
           <div className="pt-6 border-t">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Change Password
+              Ubah Kata Sandi
             </h2>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Current Password
+                  Kata Sandi Saat Ini
                 </label>
                 <input
                   type="password"
@@ -124,7 +144,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  New Password
+                  Kata Sandi Baru
                 </label>
                 <input
                   type="password"
@@ -138,7 +158,7 @@ export default function ProfilePage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm New Password
+                  Ulangi Kata Sandi Baru
                 </label>
                 <input
                   type="password"
@@ -160,7 +180,7 @@ export default function ProfilePage() {
             disabled={saving}
             className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Save Changes"}
+            {saving ? "Menyimpan…" : "Simpan Perubahan"}
           </button>
         </form>
       </div>

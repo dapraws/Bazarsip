@@ -64,7 +64,7 @@ export default function Navbar() {
 
         <nav className="hidden items-center gap-6 text-xs uppercase tracking-wide md:flex">
           <Link href="/shop" className="opacity-90 hover:opacity-100">
-            All Products
+            Semua Barang
           </Link>
 
           <button
@@ -72,21 +72,8 @@ export default function Navbar() {
             onClick={() => setOpenMega((v) => !v)}
             className="opacity-90 hover:opacity-100"
           >
-            Categories <span className="ml-1">▾</span>
+            Kategori <span className="ml-1">▾</span>
           </button>
-
-          <Link href="/shop?dept=men" className="opacity-90 hover:opacity-100">
-            Men
-          </Link>
-          <Link
-            href="/shop?dept=women"
-            className="opacity-90 hover:opacity-100"
-          >
-            Women
-          </Link>
-          <Link href="/shop?dept=kids" className="opacity-90 hover:opacity-100">
-            Kids
-          </Link>
         </nav>
 
         <div className="ml-auto flex flex-1 items-center justify-end gap-4">
@@ -99,7 +86,7 @@ export default function Navbar() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               className="w-full bg-transparent text-sm text-neutral-900 outline-none"
-              placeholder="Search Product"
+              placeholder="Cari barang"
             />
             <span className="text-neutral-500">⌕</span>
           </form>
@@ -107,7 +94,7 @@ export default function Navbar() {
           <Link
             href="/profile"
             className="rounded-full p-2 hover:bg-white/10"
-            aria-label="Account"
+            aria-label="Akun"
           >
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-xs font-semibold">
               U
@@ -117,7 +104,7 @@ export default function Navbar() {
           <Link
             href="/cart"
             className="relative rounded-full p-2 hover:bg-white/10"
-            aria-label="Cart"
+            aria-label="Keranjang"
           >
             <span className="text-lg">👜</span>
             <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[11px] font-semibold text-neutral-900">
@@ -128,7 +115,7 @@ export default function Navbar() {
           <Link
             href="/my-orders"
             className="rounded-full p-2 hover:bg-white/10"
-            aria-label="Orders"
+            aria-label="Pesanan"
           >
             <span className="text-lg">♡</span>
           </Link>
@@ -143,27 +130,12 @@ export default function Navbar() {
               <div className="grid grid-cols-2 gap-8 md:grid-cols-6">
                 <div>
                   <div className="mb-3 text-xs uppercase tracking-wide text-white/70">
-                    Shop by Department
+                    Jelajahi
                   </div>
                   <ul className="space-y-2 text-[13px] text-white/90">
                     <li>
-                      <Link href="/shop?dept=men" className="hover:underline">
-                        Men
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/shop?dept=women" className="hover:underline">
-                        Women
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/shop?dept=kids" className="hover:underline">
-                        Kids
-                      </Link>
-                    </li>
-                    <li>
                       <Link href="/shop" className="hover:underline">
-                        All Products
+                        Semua Barang
                       </Link>
                     </li>
                   </ul>
@@ -172,7 +144,7 @@ export default function Navbar() {
                 {categoryColumns.map((col, idx) => (
                   <div key={idx}>
                     <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-white/70">
-                      Categories
+                      Kategori
                     </div>
                     <ul className="space-y-2 text-[13px] text-white/90">
                       {col.map((c) => (

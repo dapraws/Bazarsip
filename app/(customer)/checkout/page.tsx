@@ -51,14 +51,14 @@ export default function CheckoutPage() {
 
       if (res.ok) {
         localStorage.removeItem("cart");
-        alert("Order placed successfully!");
+        alert("Pesanan berhasil dibuat");
         router.push(`/my-orders/${data.data.orderNumber}`);
       } else {
-        alert(data.error || "Checkout failed");
+        alert(data.error || "Pesanan gagal dibuat");
       }
     } catch (error) {
       console.error("Checkout error:", error);
-      alert("An error occurred during checkout");
+      alert("Ada masalah saat membuat pesanan");
     } finally {
       setLoading(false);
     }
@@ -72,17 +72,17 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Checkout</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Pembayaran</h1>
 
         <form onSubmit={handleCheckout} className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">
-              Shipping Information
+              Alamat Pengiriman
             </h2>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Shipping Address *
+                Alamat Lengkap *
               </label>
               <textarea
                 value={formData.shipping_address}
@@ -92,13 +92,13 @@ export default function CheckoutPage() {
                 rows={4}
                 required
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter your complete address"
+                placeholder="Nama jalan, nomor rumah, kelurahan, kecamatan, kota, kode pos"
               />
             </div>
 
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Order Notes (Optional)
+                Catatan (opsional)
               </label>
               <textarea
                 value={formData.notes}
@@ -107,14 +107,14 @@ export default function CheckoutPage() {
                 }
                 rows={3}
                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Any special instructions?"
+                placeholder="Warna lain, ukuran, atau pesan untuk penjual"
               />
             </div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">
-              Order Summary
+              Ringkasan Pesanan
             </h2>
 
             <div className="space-y-3">
@@ -148,7 +148,7 @@ export default function CheckoutPage() {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium"
           >
-            {loading ? "Processing..." : "Place Order"}
+            {loading ? "Memproses…" : "Buat Pesanan"}
           </button>
         </form>
       </div>

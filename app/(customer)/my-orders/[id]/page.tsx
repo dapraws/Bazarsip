@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatRupiah } from "@/lib/format";
+import { orderStatusLabel, paymentStatusLabel } from "@/lib/labels";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -51,7 +52,7 @@ export default function OrderDetailPage({ params }: PageProps) {
   if (!order)
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Order not found</p>
+        <p>Pesanan tidak ditemukan</p>
       </div>
     );
 
@@ -79,32 +80,32 @@ export default function OrderDetailPage({ params }: PageProps) {
             <span
               className={`px-4 py-2 text-sm font-semibold rounded-full ${statusColors[order.status]}`}
             >
-              {order.status}
+              {orderStatusLabel(order.status)}
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
             <div>
-              <p className="text-gray-600">Order Date</p>
+              <p className="text-gray-600">Tanggal Pesan</p>
               <p className="font-medium">
                 {new Date(order.created_at).toLocaleDateString("id-ID")}
               </p>
             </div>
             <div>
-              <p className="text-gray-600">Payment Status</p>
-              <p className="font-medium">{order.payment_status}</p>
+              <p className="text-gray-600">Status Pembayaran</p>
+              <p className="font-medium">{paymentStatusLabel(order.payment_status)}</p>
             </div>
           </div>
 
           <div className="mb-6">
-            <h2 className="font-semibold mb-2">Shipping Address</h2>
+            <h2 className="font-semibold mb-2">Alamat Pengiriman</h2>
             <p className="text-gray-600">
-              {order.shipping_address || "No address provided"}
+              {order.shipping_address || "Alamat belum diisi"}
             </p>
           </div>
 
           <div className="mb-6">
-            <h2 className="font-semibold mb-4">Order Items</h2>
+            <h2 className="font-semibold mb-4">Isi Pesanan</h2>
             <div className="space-y-4">
               {order.items?.map((item: any) => (
                 <div

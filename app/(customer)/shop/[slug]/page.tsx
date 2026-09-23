@@ -71,7 +71,7 @@ export default function ProductDetailPage({ params }: PageProps) {
   if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Product not found</p>
+        <p>Barang tidak ditemukan</p>
       </div>
     );
   }
@@ -85,7 +85,7 @@ export default function ProductDetailPage({ params }: PageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-4">
           <Link href="/shop" className="text-blue-600 hover:underline">
-            ← Back to Shop
+            ← Kembali ke Toko
           </Link>
         </div>
 
@@ -102,7 +102,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                   />
                 ) : (
                   <div className="w-full h-96 flex items-center justify-center text-gray-400">
-                    No Image
+                    Tanpa foto
                   </div>
                 )}
               </div>
@@ -156,13 +156,13 @@ export default function ProductDetailPage({ params }: PageProps) {
               </p>
 
               <div className="mt-6">
-                <h2 className="font-semibold mb-2">Description</h2>
+                <h2 className="font-semibold mb-2">Deskripsi</h2>
                 <p className="text-gray-600">{product.description}</p>
               </div>
 
               <div className="mt-8">
                 <label className="block text-sm font-medium mb-2">
-                  Quantity
+                  Jumlah
                 </label>
                 <div className="flex items-center space-x-3">
                   <button
@@ -197,7 +197,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                   disabled={product.stock === 0}
                   className="flex-1 border-2 border-blue-600 text-blue-600 py-3 rounded-lg hover:bg-blue-50 disabled:opacity-50"
                 >
-                  Add to Cart
+                  Masukkan Keranjang
                 </button>
                 <button
                   onClick={() => {
@@ -207,7 +207,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                   disabled={product.stock === 0}
                   className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50"
                 >
-                  Buy Now
+                  Beli Sekarang
                 </button>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
+import { pool } from "@/lib/db";
 
 interface JWTPayload {
   userId: number;
@@ -22,14 +23,18 @@ export async function GET() {
       process.env.JWT_SECRET!,
     ) as JWTPayload;
 
-    return NextResponse.json({
-      success: true,
-      user: {
-        id: decoded.userId,
-        email: decoded.email,
-        role: decoded.role,
-      },
-    });
+    // The token carries id, email and role only. The name lives in the
+    // database, and the profile page needs it.
+    const result = await pool.query(
+      "SELECT id, name, email, role FROM users WHERE id = $1",
+      [decoded.userId],
+    );
+
+    if (result.rows.length === 0) {
+      return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+    }
+
+    return NextResponse.json({ success: true, user: result.rows[0] });
   } catch (error) {
     return NextResponse.json({ error: "Invalid session" }, { status: 401 });
   }

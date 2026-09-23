@@ -121,24 +121,24 @@ export default function ShopPage() {
     <div className="mx-auto max-w-6xl px-6 py-8">
       <div className="mb-6 text-sm text-neutral-500">
         <Link href="/" className="hover:text-neutral-900">
-          Home
+          Beranda
         </Link>
         <span className="mx-2">›</span>
-        All Product
+        Semua Barang
       </div>
 
       <div className="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
         <div>
           <h1 className="text-4xl font-light text-neutral-800">
-            All <span className="italic">products</span>
+            Semua <span className="italic">barang</span>
           </h1>
           <div className="mt-2 text-sm text-neutral-500">
-            {totalItems} items
+            {totalItems} barang
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="text-sm text-neutral-500">Sort by:</div>
+          <div className="text-sm text-neutral-500">Urutkan:</div>
           <select
             value={sort}
             onChange={(e) => {
@@ -147,9 +147,9 @@ export default function ShopPage() {
             }}
             className="rounded-xl border bg-yellow-950 text-white-950 py-2 text-sm"
           >
-            <option value="price_asc">Price: Low to High</option>
-            <option value="price_desc">Price: High to Low</option>
-            <option value="newest">Newest</option>
+            <option value="price_asc">Harga: Termurah</option>
+            <option value="price_desc">Harga: Termahal</option>
+            <option value="newest">Terbaru</option>
           </select>
         </div>
       </div>
@@ -158,12 +158,12 @@ export default function ShopPage() {
         {/* Filter Sidebar */}
         <aside className="rounded-2xl bg-white p-5 shadow-card">
           <div className="mb-4 flex items-center gap-2 text-sm font-semibold">
-            <span>⎇</span> Filter
+            <span>⎇</span> Saring
           </div>
 
           <div className="py-3">
             <div className="flex items-center justify-between text-sm font-semibold">
-              Categories <span className="text-neutral-400">▾</span>
+              Kategori <span className="text-neutral-400">▾</span>
             </div>
 
             <ul className="mt-3 space-y-2 text-sm text-neutral-600">
@@ -174,7 +174,7 @@ export default function ShopPage() {
                     !categoryId ? "font-semibold text-neutral-900" : ""
                   }`}
                 >
-                  All Products
+                  Semua Barang
                 </button>
               </li>
               {categories.map((c) => (
@@ -198,7 +198,7 @@ export default function ShopPage() {
 
           <div className="py-3">
             <div className="flex items-center justify-between text-sm font-semibold">
-              Price Range <span className="text-neutral-400">▾</span>
+              Rentang Harga <span className="text-neutral-400">▾</span>
             </div>
             <div className="mt-3">
               <input
@@ -223,7 +223,7 @@ export default function ShopPage() {
 
           <div className="py-3">
             <div className="flex items-center justify-between text-sm font-semibold">
-              Search <span className="text-neutral-400">▾</span>
+              Cari <span className="text-neutral-400">▾</span>
             </div>
             <div className="mt-3">
               <input
@@ -232,7 +232,7 @@ export default function ShopPage() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                placeholder="Search product"
+                placeholder="Cari barang"
                 className="w-full rounded-xl border bg-white px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-neutral-200"
               />
             </div>
@@ -240,68 +240,6 @@ export default function ShopPage() {
 
           <Divider />
 
-          {/* The design includes Size/Color/Brand. DB schema doesn’t include these yet.
-              We keep the UI as "coming soon" to stay aligned with the mock. */}
-          <div className="py-3">
-            <div className="flex items-center justify-between text-sm font-semibold">
-              Size <span className="text-neutral-400">▾</span>
-            </div>
-            <div className="mt-3 grid grid-cols-4 gap-2 opacity-40">
-              {["S", "M", "L", "XL"].map((s) => (
-                <div
-                  key={s}
-                  className="rounded-lg border px-3 py-2 text-center text-xs"
-                >
-                  {s}
-                </div>
-              ))}
-            </div>
-            <div className="mt-2 text-xs text-neutral-400">Coming soon</div>
-          </div>
-
-          <Divider />
-
-          <div className="py-3">
-            <div className="flex items-center justify-between text-sm font-semibold">
-              Color <span className="text-neutral-400">▾</span>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2 text-xs opacity-40">
-              {[
-                { label: "Black", dot: "bg-black" },
-                { label: "Red", dot: "bg-red-600" },
-                { label: "Brown", dot: "bg-[#8b5a2b]" },
-                { label: "Orange", dot: "bg-orange-500" },
-                { label: "Pink", dot: "bg-pink-400" },
-                { label: "Blue", dot: "bg-blue-600" },
-              ].map((c) => (
-                <div
-                  key={c.label}
-                  className="flex items-center gap-2 rounded-lg border px-3 py-2"
-                >
-                  <span className={`h-3 w-3 rounded-full ${c.dot}`} />
-                  {c.label}
-                </div>
-              ))}
-            </div>
-            <div className="mt-2 text-xs text-neutral-400">Coming soon</div>
-          </div>
-
-          <Divider />
-
-          <div className="py-3">
-            <div className="flex items-center justify-between text-sm font-semibold">
-              Brand <span className="text-neutral-400">▾</span>
-            </div>
-            <div className="mt-3 space-y-2 text-sm text-neutral-700 opacity-40">
-              {["Nike", "Adidas", "Zara", "Uniqlo"].map((b) => (
-                <label key={b} className="flex items-center gap-2">
-                  <input type="checkbox" disabled />
-                  {b}
-                </label>
-              ))}
-            </div>
-            <div className="mt-2 text-xs text-neutral-400">Coming soon</div>
-          </div>
         </aside>
 
         {/* Products */}
@@ -319,9 +257,9 @@ export default function ShopPage() {
             </div>
           ) : products.length === 0 ? (
             <div className="rounded-2xl bg-white p-10 text-center shadow-card">
-              <div className="text-lg font-semibold">No products found</div>
+              <div className="text-lg font-semibold">Barang tidak ditemukan</div>
               <div className="mt-2 text-sm text-neutral-600">
-                Try adjusting filters or search keywords.
+                Coba ubah filter atau kata pencarian.
               </div>
             </div>
           ) : (
@@ -376,7 +314,7 @@ function ProductCard({ p }: { p: Product }) {
         <button
           type="button"
           className="absolute right-3 top-3 rounded-full bg-white/80 p-2 hover:bg-white"
-          aria-label="Wishlist"
+          aria-label="Simpan"
         >
           ♡
         </button>
@@ -395,7 +333,7 @@ function ProductCard({ p }: { p: Product }) {
           type="button"
           className="mt-3 w-full rounded-full bg-neutral-900 py-2 text-xs font-semibold text-white hover:bg-neutral-800"
         >
-          Add to Cart
+          + Keranjang
         </button>
       </div>
     </div>

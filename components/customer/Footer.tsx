@@ -29,73 +29,51 @@ export default function Footer() {
           </div>
 
           <div>
-            <div className="text-lg font-semibold">Collections</div>
+            <div className="text-lg font-semibold">Belanja</div>
             <ul className="mt-4 space-y-2 text-sm text-white/70">
               <li>
                 <Link href="/shop" className="hover:text-white">
-                  All Products
+                  Semua Barang
                 </Link>
               </li>
               <li>
-                <Link href="/shop" className="hover:text-white">
-                  Categories
+                <Link href="/my-orders" className="hover:text-white">
+                  Pesanan Saya
                 </Link>
               </li>
               <li>
-                <Link href="/shop?dept=men" className="hover:text-white">
-                  Men
-                </Link>
-              </li>
-              <li>
-                <Link href="/shop?dept=women" className="hover:text-white">
-                  Women
-                </Link>
-              </li>
-              <li>
-                <Link href="/shop?dept=kids" className="hover:text-white">
-                  Kids
+                <Link href="/cart" className="hover:text-white">
+                  Keranjang
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <div className="text-lg font-semibold">Support</div>
+            <div className="text-lg font-semibold">Bantuan</div>
             <ul className="mt-4 space-y-2 text-sm text-white/70">
               <li>
-                <a href="#" className="hover:text-white">
-                  FAQ
-                </a>
+                <Link href="/my-orders" className="hover:text-white">
+                  Lacak Pesanan
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
-                  Shipping &amp; Returns
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Size Guide
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Track Order
-                </a>
+                <Link href="/profile" className="hover:text-white">
+                  Akun Saya
+                </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <div className="text-lg font-semibold">Get in Touch</div>
+            <div className="text-lg font-semibold">Hubungi Kami</div>
+            {/* TODO: ganti dengan kontak toko yang sebenarnya sebelum online. */}
             <ul className="mt-4 space-y-3 text-sm text-white/70">
               <li className="flex items-center gap-2">
                 <span>⌁</span> Indonesia
               </li>
               <li className="flex items-center gap-2">
-                <span>☎</span> +62 812-3456-7890
-              </li>
-              <li className="flex items-center gap-2">
-                <span>✉</span> support@bazarsip.com
+                <span>☎</span> (isi nomor WhatsApp toko)
               </li>
             </ul>
           </div>
@@ -103,20 +81,7 @@ export default function Footer() {
 
         <div className="mt-10 border-t border-white/10 pt-6 text-sm text-white/60">
           <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-            <div>© 2026 Bazarsip. All Rights Reserved.</div>
-            <div className="flex flex-wrap gap-3">
-              <a href="#" className="hover:text-white">
-                Terms &amp; Conditions
-              </a>
-              <span className="text-white/30">|</span>
-              <a href="#" className="hover:text-white">
-                Privacy Policy
-              </a>
-              <span className="text-white/30">|</span>
-              <a href="#" className="hover:text-white">
-                Cookie Policy
-              </a>
-            </div>
+            <div>© 2026 Bazarsip.</div>
           </div>
         </div>
       </div>

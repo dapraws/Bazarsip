@@ -1,7 +1,7 @@
 // app/(customer)/page.tsx
 import Image from "next/image";
 import Link from "next/link";
-import { headers } from "next/headers";
+import { pool } from "@/lib/db";
 
 type Product = {
   id: number;
@@ -21,9 +21,11 @@ type Category = {
   product_count?: string | number;
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function LandingPage() {
   const [products, categories] = await Promise.all([
-    getProducts({ page: 1, limit: 8, sort: "newest" }),
+    getProducts(8),
     getCategories(),
   ]);
 
@@ -35,7 +37,7 @@ export default async function LandingPage() {
           <div className="absolute inset-0">
             <Image
               src="https://images.unsplash.com/photo-1520975682031-a7a2b6a9b7f5?auto=format&fit=crop&w=1600&q=80"
-              alt="Hero"
+              alt="Etalase Bazarsip"
               fill
               className="object-cover"
               priority
@@ -46,25 +48,25 @@ export default async function LandingPage() {
 
           <div className="relative p-10 md:p-12">
             <div className="text-xs font-semibold tracking-[0.25em] text-white/80">
-              NEW COLLECTION
+              BARANG BARU
             </div>
 
             <h1 className="mt-4 text-4xl font-light leading-tight text-white md:text-6xl">
-              Bold Looks. <br />
-              <span className="font-semibold">Unapologetic</span>{" "}
-              <span className="italic">Style.</span>
+              Baju, Sepatu, Tas. <br />
+              <span className="font-semibold">Buat</span>{" "}
+              <span className="italic">Semua Usia.</span>
             </h1>
 
             <p className="mt-4 max-w-xl text-sm text-white/80">
-              Don’t just blend in. Discover premium streetwear and accessories
-              designed to make a statement in every step.
+              Koleksi anak, remaja, dan dewasa — merk maupun non-merk. Pilih
+              yang cocok, tanya-tanya dulu juga boleh.
             </p>
 
             <Link
               href="/shop"
               className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/20"
             >
-              SHOP NOW <span aria-hidden>→</span>
+              LIHAT BARANG <span aria-hidden>→</span>
             </Link>
 
             <div className="mt-8 flex justify-center gap-3">
@@ -87,14 +89,14 @@ export default async function LandingPage() {
         <section className="mt-12">
           <div className="flex items-end justify-between">
             <h2 className="text-2xl font-light text-neutral-700">
-              Bestselling{" "}
-              <span className="italic text-neutral-900">products</span>
+              Barang{" "}
+              <span className="italic text-neutral-900">terbaru</span>
             </h2>
             <Link
               href="/shop"
               className="text-sm font-semibold text-neutral-600 hover:underline"
             >
-              More products →
+              Lihat semua →
             </Link>
           </div>
 
@@ -113,7 +115,7 @@ export default async function LandingPage() {
             <div className="absolute inset-0">
               <Image
                 src="https://images.unsplash.com/photo-1520975868721-7b07f4619052?auto=format&fit=crop&w=1800&q=80"
-                alt="Art of Layering"
+                alt="Padu padan"
                 fill
                 className="object-cover opacity-85"
                 sizes="(max-width: 1200px) 100vw, 1200px"
@@ -122,17 +124,17 @@ export default async function LandingPage() {
             <div className="absolute inset-0 bg-black/35" />
             <div className="relative p-10 md:p-12">
               <h3 className="text-4xl font-light text-white">
-                The Art of <span className="italic">Layering</span>
+                Padu <span className="italic">Padan</span>
               </h3>
               <p className="mt-4 max-w-xl text-sm text-white/80">
-                Step into the season with our signature trench coats. A perfect
-                blend of classic tailoring and contemporary silhouette.
+                Atasan, bawahan, sampai aksesoris. Dicari satu-satu atau
+                sekalian satu set.
               </p>
               <Link
                 href="/shop"
                 className="mt-6 inline-flex items-center gap-2 rounded-full bg-white/15 px-5 py-3 text-sm font-semibold text-white backdrop-blur hover:bg-white/20"
               >
-                EXPLORE <span aria-hidden>→</span>
+                JELAJAHI <span aria-hidden>→</span>
               </Link>
             </div>
           </div>
@@ -143,18 +145,18 @@ export default async function LandingPage() {
           <div className="flex items-end justify-between">
             <div>
               <h2 className="text-2xl font-light text-neutral-700">
-                Shop by{" "}
-                <span className="italic text-neutral-900">category</span>
+                Belanja per{" "}
+                <span className="italic text-neutral-900">kategori</span>
               </h2>
               <p className="mt-2 text-sm text-neutral-500">
-                Explore our collections tailored to elevate your wardrobe.
+                Cari lebih cepat lewat jenis barangnya.
               </p>
             </div>
             <Link
               href="/shop"
               className="text-sm font-semibold text-neutral-600 hover:underline"
             >
-              More category →
+              Lihat semua →
             </Link>
           </div>
 
@@ -195,11 +197,11 @@ export default async function LandingPage() {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-light text-neutral-700">
-                The Word on{" "}
-                <span className="italic text-neutral-900">the Street</span>
+                Kata{" "}
+                <span className="italic text-neutral-900">pelanggan</span>
               </h2>
               <p className="mt-2 text-sm text-neutral-500">
-                (Coming soon) 
+                (Segera hadir)
               </p>
             </div>
 
@@ -270,48 +272,6 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        {/* SUBSCRIBE */}
-        <section className="mt-14 pb-16">
-          <div className="relative overflow-hidden rounded-3xl bg-neutral-900 shadow-card">
-            <div className="absolute inset-0">
-              <Image
-                src="https://images.unsplash.com/photo-1520975900956-2f6db1f7e4d8?auto=format&fit=crop&w=1800&q=80"
-                alt="Subscribe"
-                fill
-                className="object-cover opacity-75"
-                sizes="(max-width: 1200px) 100vw, 1200px"
-              />
-            </div>
-            <div className="absolute inset-0 bg-black/45" />
-            <div className="relative p-10 md:p-12">
-              <div className="text-center text-white">
-                <div className="text-3xl font-light">
-                  Subscribe our email and
-                </div>
-                <div className="mt-2 text-4xl font-semibold">GET 15% OFF</div>
-
-                <form className="mx-auto mt-6 flex max-w-xl gap-3">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    className="w-full rounded-full bg-white/15 px-5 py-3 text-sm text-white outline-none placeholder:text-white/60 backdrop-blur"
-                  />
-                  <button
-                    type="submit"
-                    className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-neutral-900 hover:bg-white/90"
-                  >
-                    Subscribe
-                  </button>
-                </form>
-
-                <p className="mx-auto mt-4 max-w-2xl text-xs text-white/70">
-                  Be the first to cop new drops, exclusive collabs, and styling
-                  hacks.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </div>
   );
@@ -349,7 +309,7 @@ function ProductMiniCard({ p }: { p: Product }) {
           href={`/shop/${p.slug}`}
           className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-neutral-900 py-2 text-xs font-semibold text-white hover:bg-neutral-800"
         >
-          View Detail
+          Lihat Detail
         </Link>
       </div>
     </div>
@@ -389,34 +349,39 @@ function TestimonialCard({ active, name }: { active: boolean; name: string }) {
   );
 }
 
-/** --- data fetchers (pakai DB via API routes kamu) --- */
-async function getProducts(params: {
-  page: number;
-  limit: number;
-  sort: "newest" | "price_asc" | "price_desc";
-}) {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
-  const url = new URL(`${base}/api/products`);
-  url.searchParams.set("page", String(params.page));
-  url.searchParams.set("limit", String(params.limit));
-  url.searchParams.set("sort", params.sort);
-
-  const res = await fetch(url.toString(), { cache: "no-store" });
-  if (!res.ok) return [] as Product[];
-
-  const json = await res.json();
-  return (json?.data ?? []) as Product[];
+/**
+ * Data for the storefront home page.
+ *
+ * This is a server component, so it reads the database directly rather than
+ * calling its own API over HTTP. The previous version built a URL from
+ * NEXT_PUBLIC_APP_URL — a variable that is not set anywhere — and so always
+ * fell back to a hardcoded http://localhost:3000, which fails on any host
+ * that does not happen to serve on that port.
+ */
+async function getProducts(limit: number) {
+  const { rows } = await pool.query(
+    `SELECT p.id, p.name, p.slug, p.price, p.image_url, p.images,
+            c.name AS category_name
+     FROM products p
+     LEFT JOIN categories c ON p.category_id = c.id
+     WHERE p.is_active = true
+     ORDER BY p.created_at DESC
+     LIMIT $1`,
+    [limit],
+  );
+  return rows as Product[];
 }
 
 async function getCategories() {
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
-  const res = await fetch(`${base}/api/categories`, { cache: "no-store" });
-  if (!res.ok) return [] as Category[];
-
-  const json = await res.json();
-  return (json?.data ?? []) as Category[];
+  const { rows } = await pool.query(
+    `SELECT c.id, c.name, c.slug, c.image_url,
+            COUNT(p.id)::int AS product_count
+     FROM categories c
+     LEFT JOIN products p ON p.category_id = c.id AND p.is_active = true
+     GROUP BY c.id
+     ORDER BY c.name ASC`,
+  );
+  return rows as Category[];
 }
 
 /** --- image pickers (utamakan data DB) --- */
