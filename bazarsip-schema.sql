@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS cart_items CASCADE;
 DROP TABLE IF EXISTS carts CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
+DROP TABLE IF EXISTS suppliers CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
 -- Users table
@@ -32,6 +33,17 @@ CREATE TABLE categories (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Suppliers table
+CREATE TABLE suppliers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    whatsapp VARCHAR(20), -- digits with country code, e.g. 6281234567890
+    location TEXT,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Products table
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
@@ -43,6 +55,9 @@ CREATE TABLE products (
     image_url TEXT,
     images TEXT[], -- Array of image URLs
     category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+    -- SET NULL: removing a supplier must never remove their products.
+    supplier_id INTEGER REFERENCES suppliers(id) ON DELETE SET NULL,
+    availability VARCHAR(20) NOT NULL DEFAULT 'ready' CHECK (availability IN ('ready', 'preorder')),
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -99,6 +114,8 @@ CREATE TABLE order_items (
 
 -- Create indexes for better query performance
 CREATE INDEX idx_products_category_id ON products(category_id);
+CREATE INDEX idx_products_supplier ON products(supplier_id);
+CREATE INDEX idx_products_availability ON products(availability);
 CREATE INDEX idx_products_slug ON products(slug);
 CREATE INDEX idx_products_is_active ON products(is_active);
 CREATE INDEX idx_cart_items_cart_id ON cart_items(cart_id);
@@ -153,6 +170,9 @@ CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_categories_updated_at BEFORE UPDATE ON categories
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_suppliers_updated_at BEFORE UPDATE ON suppliers
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_products_updated_at BEFORE UPDATE ON products

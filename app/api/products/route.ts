@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
-import { requireAuth } from "@/lib/auth";
+import { requireAuth, verifyAuth } from "@/lib/auth";
 import { slugify, nextFreeSlug } from "@/lib/slug";
 
 // GET - Public route (no auth required)
@@ -45,16 +45,26 @@ export async function GET(req: NextRequest) {
     paramCount++;
     const offsetParam = paramCount;
 
+    // Supplier details are internal; this route is public.
+    const { isValid, payload } = await verifyAuth(req);
+    const isAdmin = isValid && payload?.role === "admin";
+
     const query = `
       SELECT p.*, c.name as category_name, c.slug as category_slug
+             ${isAdmin ? ", s.name as supplier_name, s.whatsapp as supplier_whatsapp" : ""}
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
+      ${isAdmin ? "LEFT JOIN suppliers s ON p.supplier_id = s.id" : ""}
       WHERE ${whereClause}
       ORDER BY p.created_at DESC
       LIMIT $${limitParam} OFFSET $${offsetParam}
     `;
 
     const result = await pool.query(query, [...values, limit, offset]);
+
+    if (!isAdmin) {
+      for (const row of result.rows) delete row.supplier_id;
+    }
 
     return NextResponse.json({
       success: true,
@@ -98,6 +108,8 @@ export async function POST(req: NextRequest) {
       images,
       category_id,
       is_active,
+      supplier_id,
+      availability,
     } = body;
 
     if (!name) {
@@ -121,8 +133,8 @@ export async function POST(req: NextRequest) {
     );
 
     const result = await pool.query(
-      `INSERT INTO products (name, slug, description, price, stock, image_url, images, category_id, is_active)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO products (name, slug, description, price, stock, image_url, images, category_id, is_active, supplier_id, availability)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
       [
         name,
@@ -134,6 +146,8 @@ export async function POST(req: NextRequest) {
         images || [],
         category_id || null,
         is_active !== undefined ? is_active : true,
+        supplier_id || null,
+        availability === "preorder" ? "preorder" : "ready",
       ],
     );
 

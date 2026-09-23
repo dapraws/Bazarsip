@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
-import { requireAuth } from "@/lib/auth";
+import { requireAuth, verifyAuth } from "@/lib/auth";
 
 // Public URLs address products and categories by slug; the admin UI still
 // links by id. slugify() never produces a purely numeric slug, so a numeric
@@ -21,9 +21,12 @@ export async function GET(
     const lookup = byIdOrSlug(id, "p");
 
     const result = await pool.query(
-      `SELECT p.*, c.name as category_name, c.slug as category_slug
+      `SELECT p.*, c.name as category_name, c.slug as category_slug,
+              s.name as supplier_name, s.whatsapp as supplier_whatsapp,
+              s.location as supplier_location, s.notes as supplier_notes
        FROM products p
        LEFT JOIN categories c ON p.category_id = c.id
+       LEFT JOIN suppliers s ON p.supplier_id = s.id
        WHERE ${lookup.clause}`,
       [lookup.value],
     );
@@ -35,9 +38,23 @@ export async function GET(
       );
     }
 
+    // Who supplies an item, and at what contact, is internal business
+    // information. This route is public, so it is stripped for everyone
+    // except admins.
+    const { isValid, payload } = await verifyAuth(req);
+    const product = result.rows[0];
+
+    if (!isValid || payload?.role !== "admin") {
+      delete product.supplier_id;
+      delete product.supplier_name;
+      delete product.supplier_whatsapp;
+      delete product.supplier_location;
+      delete product.supplier_notes;
+    }
+
     return NextResponse.json({
       success: true,
-      data: result.rows[0],
+      data: product,
     });
   } catch (error: any) {
     console.error("Error fetching product:", error);
@@ -75,6 +92,8 @@ export async function PUT(
       images,
       category_id,
       is_active,
+      supplier_id,
+      availability,
     } = body;
 
     // Check if product exists
@@ -147,6 +166,24 @@ export async function PUT(
       paramCount++;
       updates.push(`is_active = $${paramCount}`);
       values.push(is_active);
+    }
+
+    if (supplier_id !== undefined) {
+      paramCount++;
+      updates.push(`supplier_id = $${paramCount}`);
+      values.push(supplier_id || null);
+    }
+
+    if (availability !== undefined) {
+      if (!["ready", "preorder"].includes(availability)) {
+        return NextResponse.json(
+          { success: false, error: "Availability must be 'ready' or 'preorder'" },
+          { status: 400 },
+        );
+      }
+      paramCount++;
+      updates.push(`availability = $${paramCount}`);
+      values.push(availability);
     }
 
     if (updates.length === 0) {
