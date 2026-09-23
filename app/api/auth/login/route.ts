@@ -9,8 +9,19 @@ import { clientIp } from "@/lib/request";
 // by their own success.
 const loginLimiter = createRateLimiter(5, 15 * 60 * 1000);
 
-function rejectOrThrottle(key: string) {
-  const { allowed, retryAfter } = loginLimiter.hit(key);
+// Keying only on address+email leaves credential stuffing wide open: rotate
+// the email and every address gets its own fresh allowance. This caps the
+// total failures from one address regardless of which accounts are tried.
+// The ceiling is generous enough for a household or a shop sharing a
+// connection, and it is not cleared by a success — otherwise an attacker
+// with one valid account could reset it at will.
+const addressLimiter = createRateLimiter(20, 15 * 60 * 1000);
+
+function rejectOrThrottle(key: string, ip: string) {
+  const perEmail = loginLimiter.hit(key);
+  const perAddress = addressLimiter.hit(ip);
+  const allowed = perEmail.allowed && perAddress.allowed;
+  const retryAfter = Math.max(perEmail.retryAfter, perAddress.retryAfter);
 
   if (!allowed) {
     return NextResponse.json(
@@ -39,8 +50,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const limiterKey = `${clientIp(req)}:${String(email).toLowerCase()}`;
-    const throttled = loginLimiter.isBlocked(limiterKey);
+    const ip = clientIp(req);
+    const limiterKey = `${ip}:${String(email).toLowerCase()}`;
+    const byEmail = loginLimiter.isBlocked(limiterKey);
+    const byAddress = addressLimiter.isBlocked(ip);
+    const throttled = {
+      blocked: byEmail.blocked || byAddress.blocked,
+      retryAfter: Math.max(byEmail.retryAfter, byAddress.retryAfter),
+    };
 
     if (throttled.blocked) {
       return NextResponse.json(
@@ -58,14 +75,14 @@ export async function POST(req: NextRequest) {
     );
 
     if (userRes.rows.length === 0) {
-      return rejectOrThrottle(limiterKey);
+      return rejectOrThrottle(limiterKey, ip);
     }
 
     const user = userRes.rows[0];
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-      return rejectOrThrottle(limiterKey);
+      return rejectOrThrottle(limiterKey, ip);
     }
 
     loginLimiter.reset(limiterKey);
