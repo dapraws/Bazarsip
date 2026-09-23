@@ -32,6 +32,15 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# local tooling configs
+CLAUDE.md
+AGENTS.md
+DESIGN.md
+.claude/
+.cursor/
+.github/copilot-instructions.md
 
 # vercel
 .vercel
@@ -40,4 +49,3 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/app/generated/prisma
