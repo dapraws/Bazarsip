@@ -62,7 +62,7 @@ export default function MyOrdersPage() {
           <div className="space-y-4">
             {orders.map((order) => (
               <div
-                key={order.id}
+                key={order.order_number}
                 className="bg-white rounded-xl shadow-sm border p-6"
               >
                 <div className="flex items-center justify-between mb-4">

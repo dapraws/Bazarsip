@@ -57,6 +57,13 @@ export async function GET(req: NextRequest) {
 
     const result = await pool.query(query, values);
 
+    if (authResult.user.role !== "admin") {
+      for (const row of result.rows) {
+        delete row.id;
+        delete row.user_id;
+      }
+    }
+
     return NextResponse.json({
       success: true,
       data: result.rows,

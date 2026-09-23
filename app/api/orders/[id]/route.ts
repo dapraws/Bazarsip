@@ -2,12 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 
-// Orders are addressed by their public code (BZR-XXXXXXXX) in customer-facing
-// links and by id from the admin UI.
-function byIdOrNumber(param: string) {
-  return /^\d+$/.test(param)
-    ? { clause: "o.id = $1", value: Number(param) }
-    : { clause: "o.order_number = $1", value: param.toUpperCase() };
+// Admins address orders by id; customers only ever by the public code.
+//
+// Letting a customer look one up by id hands back the sequential primary key,
+// and "my order is 47" discloses roughly how many the shop has taken — the
+// exact thing the random order number exists to hide.
+function orderLookup(param: string, isAdmin: boolean) {
+  if (isAdmin && /^\d+$/.test(param)) {
+    return { clause: "o.id = $1", value: Number(param) };
+  }
+  return { clause: "o.order_number = $1", value: param.toUpperCase() };
 }
 
 // GET - Authenticated users (customers can only see their own, admins see all)
@@ -23,7 +27,8 @@ export async function GET(
 
   try {
     const { id } = await params;
-    const lookup = byIdOrNumber(id);
+    const isAdmin = authResult.user.role === "admin";
+    const lookup = orderLookup(id, isAdmin);
 
     // Get order details
     const orderResult = await pool.query(
@@ -46,15 +51,19 @@ export async function GET(
 
     const order = orderResult.rows[0];
 
-    // Check authorization: customers can only see their own orders
-    if (
-      authResult.user.role === "customer" &&
-      order.user_id !== authResult.user.userId
-    ) {
+    // Someone else's order is reported as missing, not as forbidden:
+    // answering 403 here confirms the order exists, which is enough to count
+    // the shop's orders by walking the identifiers.
+    if (!isAdmin && order.user_id !== authResult.user.userId) {
       return NextResponse.json(
-        { success: false, error: "Forbidden" },
-        { status: 403 },
+        { success: false, error: "Order not found" },
+        { status: 404 },
       );
+    }
+
+    if (!isAdmin) {
+      delete order.id;
+      delete order.user_id;
     }
 
     // Get order items
