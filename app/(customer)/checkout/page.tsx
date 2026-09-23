@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { formatRupiah } from "@/lib/format";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -64,7 +65,7 @@ export default function CheckoutPage() {
   }
 
   const total = cart.reduce(
-    (sum, item) => sum + (item.product?.price || 0) * item.quantity,
+    (sum, item) => sum + Number(item.product?.price || 0) * item.quantity,
     0,
   );
 
@@ -126,10 +127,9 @@ export default function CheckoutPage() {
                     {item.product?.name} × {item.quantity}
                   </span>
                   <span className="text-gray-900 font-medium">
-                    Rp{" "}
-                    {(
-                      (item.product?.price || 0) * item.quantity
-                    ).toLocaleString("id-ID")}
+                    {formatRupiah(
+                      Number(item.product?.price || 0) * item.quantity,
+                    )}
                   </span>
                 </div>
               ))}
@@ -137,7 +137,7 @@ export default function CheckoutPage() {
               <div className="pt-3 border-t">
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>Rp {total.toLocaleString("id-ID")}</span>
+                  <span>{formatRupiah(total)}</span>
                 </div>
               </div>
             </div>

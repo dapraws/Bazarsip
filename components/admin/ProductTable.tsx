@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { formatRupiah } from "@/lib/format";
 
 interface Product {
   id: number;
@@ -132,7 +133,7 @@ export default function ProductTable({
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  Rp {product.price.toLocaleString("id-ID")}
+                  {formatRupiah(product.price)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span

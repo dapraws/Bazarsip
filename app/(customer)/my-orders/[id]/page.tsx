@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { formatRupiah } from "@/lib/format";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -126,9 +127,7 @@ export default function OrderDetailPage({ params }: PageProps) {
                   <div className="text-right">
                     <p className="font-medium">
                       Rp{" "}
-                      {(parseFloat(item.price) * item.quantity).toLocaleString(
-                        "id-ID",
-                      )}
+                      {formatRupiah(parseFloat(item.price) * item.quantity)}
                     </p>
                   </div>
                 </div>
@@ -139,7 +138,7 @@ export default function OrderDetailPage({ params }: PageProps) {
           <div className="border-t pt-4">
             <div className="flex justify-between text-lg font-bold">
               <span>Total</span>
-              <span>Rp {parseFloat(order.total).toLocaleString("id-ID")}</span>
+              <span>{formatRupiah(order.total)}</span>
             </div>
           </div>
         </div>

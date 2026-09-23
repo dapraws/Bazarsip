@@ -1,3 +1,5 @@
+import { formatRupiah } from "@/lib/format";
+
 interface StatsCardsProps {
   stats: {
     totalRevenue: number;
@@ -11,7 +13,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
   const statCards = [
     {
       title: "Total Revenue",
-      value: `Rp ${stats.totalRevenue.toLocaleString("id-ID")}`,
+      value: formatRupiah(stats.totalRevenue),
       icon: (
         <svg
           className="w-8 h-8"

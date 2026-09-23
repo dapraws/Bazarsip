@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatRupiah } from "@/lib/format";
 
 interface Order {
   id: number;
@@ -93,7 +94,7 @@ export default function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   Rp{" "}
-                  {parseFloat(order.total.toString()).toLocaleString("id-ID")}
+                  {formatRupiah(order.total)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span

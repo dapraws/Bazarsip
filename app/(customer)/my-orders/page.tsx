@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { formatRupiah } from "@/lib/format";
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -82,7 +83,7 @@ export default function MyOrdersPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-2xl font-bold text-gray-900">
-                      Rp {parseFloat(order.total).toLocaleString("id-ID")}
+                      {formatRupiah(order.total)}
                     </p>
                   </div>
                   <Link

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { formatRupiah } from "@/lib/format";
 
 type Category = {
   id: number;
@@ -16,6 +17,7 @@ type Product = {
   slug: string;
   description: string | null;
   price: string | number;
+  availability?: string;
   stock: number;
   image_url: string | null;
   images: string[] | null;
@@ -33,11 +35,6 @@ type ProductsResponse = {
     totalPages: number;
   };
 };
-
-function formatRupiah(v: string | number) {
-  const n = typeof v === "string" ? Number(v) : v;
-  return `Rp. ${Intl.NumberFormat("id-ID").format(Math.round(n || 0))}`;
-}
 
 export default function ShopPage() {
   const [categories, setCategories] = useState<Category[]>([]);

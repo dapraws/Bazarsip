@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { formatRupiah } from "@/lib/format";
 
 type Product = {
   id: number;
@@ -100,15 +101,14 @@ export default function CartPage() {
     });
   }
 
-  const subtotal = useMemo(() => {
+  // Prices arrive from the API as strings (DECIMAL columns), so coerce
+  // before adding them up.
+  const total = useMemo(() => {
     return cart.reduce(
-      (sum, item) => sum + (item.product?.price ?? 0) * item.quantity,
+      (sum, item) => sum + Number(item.product?.price ?? 0) * item.quantity,
       0,
     );
   }, [cart]);
-
-  const tax = subtotal * 0.1;
-  const total = subtotal + tax;
 
   if (loading) {
     return (
@@ -160,7 +160,7 @@ export default function CartPage() {
                     {item.product?.name ?? "Product unavailable"}
                   </h3>
                   <p className="text-gray-600">
-                    Rp {(item.product?.price ?? 0).toLocaleString("id-ID")}
+                    {formatRupiah(item.product?.price)}
                   </p>
                 </div>
 
@@ -188,10 +188,9 @@ export default function CartPage() {
 
                 <div className="text-right">
                   <p className="font-bold">
-                    Rp{" "}
-                    {(
-                      (item.product?.price ?? 0) * item.quantity
-                    ).toLocaleString("id-ID")}
+                    {formatRupiah(
+                      Number(item.product?.price ?? 0) * item.quantity,
+                    )}
                   </p>
                   <button
                     onClick={() => removeItem(item.productId)}
@@ -208,18 +207,13 @@ export default function CartPage() {
             <div className="bg-white rounded-xl shadow-sm border p-6 sticky top-24">
               <h2 className="text-xl font-bold mb-6">Order Summary</h2>
               <div className="space-y-4">
-                <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
-                  <span>Rp {subtotal.toLocaleString("id-ID")}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Tax (10%)</span>
-                  <span>Rp {tax.toLocaleString("id-ID")}</span>
-                </div>
-                <div className="pt-4 border-t flex justify-between text-lg font-bold">
+                <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>Rp {total.toLocaleString("id-ID")}</span>
+                  <span>{formatRupiah(total)}</span>
                 </div>
+                <p className="text-xs text-gray-500">
+                  Ongkos kirim dihitung saat konfirmasi pesanan.
+                </p>
               </div>
 
               <button

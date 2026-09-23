@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { formatRupiah } from "@/lib/format";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -137,16 +138,20 @@ export default function ProductDetailPage({ params }: PageProps) {
                 {product.name}
               </h1>
               <p className="text-4xl font-bold text-gray-900 mt-4">
-                Rp {product.price.toLocaleString("id-ID")}
+                {formatRupiah(product.price)}
               </p>
 
               <p className="mt-4 text-sm font-medium">
-                {product.stock > 0 ? (
+                {product.availability === "preorder" ? (
+                  <span className="text-amber-600">
+                    Pre-order — dipesankan ke supplier dulu
+                  </span>
+                ) : product.stock > 0 ? (
                   <span className="text-green-600">
-                    ✓ In Stock ({product.stock} available)
+                    Ready — stok {product.stock}
                   </span>
                 ) : (
-                  <span className="text-red-600">✗ Out of Stock</span>
+                  <span className="text-red-600">Stok habis</span>
                 )}
               </p>
 
