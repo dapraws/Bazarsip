@@ -5,6 +5,7 @@ import Link from "next/link";
 
 interface Order {
   id: number;
+  order_number: string;
   user_id: number;
   customer_name: string;
   email: string;
@@ -171,7 +172,7 @@ export default function AdminOrdersPage() {
                         href={`/orders/${order.id}`}
                         className="text-sm font-medium text-blue-600 hover:text-blue-800"
                       >
-                        #{order.id}
+                        {order.order_number}
                       </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

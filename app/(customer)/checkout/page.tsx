@@ -33,13 +33,10 @@ export default function CheckoutPage() {
     setLoading(true);
 
     try {
-      const userId = 1; // TODO: Get from JWT session
-
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          user_id: userId,
           items: cart.map((item) => ({
             product_id: item.productId,
             quantity: item.quantity,
@@ -54,7 +51,7 @@ export default function CheckoutPage() {
       if (res.ok) {
         localStorage.removeItem("cart");
         alert("Order placed successfully!");
-        router.push(`/my-orders/${data.data.orderId}`);
+        router.push(`/my-orders/${data.data.orderNumber}`);
       } else {
         alert(data.error || "Checkout failed");
       }

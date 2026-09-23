@@ -13,8 +13,8 @@ export default function MyOrdersPage() {
 
   async function fetchOrders() {
     try {
-      const userId = 1; // TODO: Get from JWT
-      const res = await fetch(`/api/orders?userId=${userId}`);
+      // The API scopes results to the session user; no id is needed.
+      const res = await fetch("/api/orders");
       const data = await res.json();
 
       if (data.success) {
@@ -66,7 +66,7 @@ export default function MyOrdersPage() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="font-bold text-gray-900">
-                      Order #{order.id}
+                      {order.order_number}
                     </h3>
                     <p className="text-sm text-gray-600">
                       {new Date(order.created_at).toLocaleDateString("id-ID")}
@@ -86,7 +86,7 @@ export default function MyOrdersPage() {
                     </p>
                   </div>
                   <Link
-                    href={`/my-orders/${order.id}`}
+                    href={`/my-orders/${order.order_number}`}
                     className="text-blue-600 hover:text-blue-800 font-medium"
                   >
                     View Details →

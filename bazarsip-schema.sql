@@ -38,7 +38,7 @@ CREATE TABLE products (
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,
-    price DECIMAL(10, 2) NOT NULL,
+    price DECIMAL(14, 2) NOT NULL,
     stock INTEGER NOT NULL DEFAULT 0,
     image_url TEXT,
     images TEXT[], -- Array of image URLs
@@ -73,13 +73,14 @@ CREATE TABLE cart_items (
 -- Orders table
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
+    order_number VARCHAR(20) NOT NULL UNIQUE, -- public reference, e.g. BZR-K4M2X9PT
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    total DECIMAL(10, 2) NOT NULL,
+    total DECIMAL(14, 2) NOT NULL,
     status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled')),
     payment_method VARCHAR(50),
     payment_status VARCHAR(50) DEFAULT 'unpaid' CHECK (payment_status IN ('unpaid', 'paid', 'failed', 'refunded')),
     shipping_address TEXT,
-    shipping_cost DECIMAL(10, 2) DEFAULT 0,
+    shipping_cost DECIMAL(14, 2) DEFAULT 0,
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -90,9 +91,9 @@ CREATE TABLE order_items (
     id SERIAL PRIMARY KEY,
     order_id INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-    price DECIMAL(10, 2) NOT NULL, -- Price at time of purchase
+    price DECIMAL(14, 2) NOT NULL, -- Price at time of purchase
     quantity INTEGER NOT NULL CHECK (quantity > 0),
-    subtotal DECIMAL(10, 2) GENERATED ALWAYS AS (price * quantity) STORED,
+    subtotal DECIMAL(14, 2) GENERATED ALWAYS AS (price * quantity) STORED,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -103,6 +104,7 @@ CREATE INDEX idx_products_is_active ON products(is_active);
 CREATE INDEX idx_cart_items_cart_id ON cart_items(cart_id);
 CREATE INDEX idx_cart_items_product_id ON cart_items(product_id);
 CREATE INDEX idx_orders_user_id ON orders(user_id);
+CREATE INDEX idx_orders_order_number ON orders(order_number);
 CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX idx_users_email ON users(email);

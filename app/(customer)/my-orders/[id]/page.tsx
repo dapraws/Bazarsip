@@ -74,7 +74,7 @@ export default function OrderDetailPage({ params }: PageProps) {
 
         <div className="bg-white rounded-xl shadow-sm border p-8">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold">Order #{order.id}</h1>
+            <h1 className="text-3xl font-bold">{order.order_number}</h1>
             <span
               className={`px-4 py-2 text-sm font-semibold rounded-full ${statusColors[order.status]}`}
             >

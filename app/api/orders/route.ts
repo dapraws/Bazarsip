@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { UserError } from "@/lib/errors";
+import { generateOrderNumber } from "@/lib/order-number";
 
 // GET - Authenticated users only (customers see their own, admins see all)
 export async function GET(req: NextRequest) {
@@ -128,13 +129,20 @@ export async function POST(req: NextRequest) {
 
     // Create order
     const orderResult = await client.query(
-      `INSERT INTO orders (user_id, total, shipping_address, notes, status, payment_status)
-       VALUES ($1, $2, $3, $4, 'pending', 'unpaid')
-       RETURNING id`,
-      [user_id, total, shipping_address, notes || null],
+      `INSERT INTO orders (user_id, total, shipping_address, notes, status, payment_status, order_number)
+       VALUES ($1, $2, $3, $4, 'pending', 'unpaid', $5)
+       RETURNING id, order_number`,
+      [
+        user_id,
+        total,
+        shipping_address,
+        notes || null,
+        generateOrderNumber(),
+      ],
     );
 
     const orderId = orderResult.rows[0].id;
+    const orderNumber = orderResult.rows[0].order_number;
 
     // Create order items and update stock
     for (const item of orderItems) {
@@ -163,7 +171,7 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         message: "Order created successfully",
-        data: { orderId, total },
+        data: { orderId, orderNumber, total },
       },
       { status: 201 },
     );

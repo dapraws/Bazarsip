@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 
+// Orders are addressed by their public code (BZR-XXXXXXXX) in customer-facing
+// links and by id from the admin UI.
+function byIdOrNumber(param: string) {
+  return /^\d+$/.test(param)
+    ? { clause: "o.id = $1", value: Number(param) }
+    : { clause: "o.order_number = $1", value: param.toUpperCase() };
+}
+
 // GET - Authenticated users (customers can only see their own, admins see all)
 export async function GET(
   req: NextRequest,
@@ -15,6 +23,7 @@ export async function GET(
 
   try {
     const { id } = await params;
+    const lookup = byIdOrNumber(id);
 
     // Get order details
     const orderResult = await pool.query(
@@ -24,8 +33,8 @@ export async function GET(
         u.email as customer_email
        FROM orders o
        JOIN users u ON o.user_id = u.id
-       WHERE o.id = $1`,
-      [id],
+       WHERE ${lookup.clause}`,
+      [lookup.value],
     );
 
     if (orderResult.rows.length === 0) {
@@ -57,7 +66,7 @@ export async function GET(
        FROM order_items oi
        JOIN products p ON oi.product_id = p.id
        WHERE oi.order_id = $1`,
-      [id],
+      [order.id],
     );
 
     return NextResponse.json({
