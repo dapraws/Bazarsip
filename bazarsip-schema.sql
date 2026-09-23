@@ -126,35 +126,26 @@ CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX idx_users_email ON users(email);
 
--- Insert sample categories
-INSERT INTO categories (name, slug, description, image_url) VALUES
-('Electronics', 'electronics', 'Electronic devices and gadgets', 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=800'),
-('Fashion', 'fashion', 'Clothing and accessories', 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=800'),
-('Home & Living', 'home-living', 'Home decoration and furniture', 'https://images.unsplash.com/photo-1556912173-46c336c7fd55?w=800'),
-('Books', 'books', 'Books and magazines', 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?w=800'),
-('Sports', 'sports', 'Sports equipment and gear', 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800');
+-- Starter categories, by item type.
+--
+-- The catalogue also varies by audience (anak / remaja / dewasa) and by
+-- branded vs unbranded, but a product carries exactly one category, so those
+-- axes need a separate field before they can be browsed on.
+INSERT INTO categories (name, slug, description) VALUES
+('Sepatu',    'sepatu',    'Sepatu anak, remaja, dan dewasa'),
+('Tas',       'tas',       'Tas sekolah, selempang, ransel, dan tas tangan'),
+('Baju',      'baju',      'Atasan, kaos, kemeja, dan dress'),
+('Celana',    'celana',    'Celana panjang, pendek, jeans, dan rok'),
+('Olahraga',  'olahraga',  'Perlengkapan dan pakaian olahraga'),
+('Formal',    'formal',    'Pakaian kerja dan acara resmi'),
+('Aksesoris', 'aksesoris', 'Topi, ikat pinggang, kaus kaki, dan lainnya');
 
--- Insert sample products
-INSERT INTO products (name, slug, description, price, stock, image_url, images, category_id, is_active) VALUES
-('Gaming Laptop Pro', 'gaming-laptop-pro', 'High-performance gaming laptop with RTX 4060 graphics card, 16GB RAM, 512GB SSD', 15000000.00, 25, 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800', ARRAY['https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=800', 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=800'], 1, true),
-('Wireless Headphones', 'wireless-headphones', 'Premium noise-cancelling wireless headphones with 30-hour battery life', 2500000.00, 50, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800', ARRAY['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800'], 1, true),
-('Smartphone X Pro', 'smartphone-x-pro', 'Latest flagship smartphone with amazing camera and 5G connectivity', 12000000.00, 30, 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800', ARRAY['https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800'], 1, true),
-('Mechanical Keyboard', 'mechanical-keyboard', 'RGB mechanical keyboard with Cherry MX switches', 1500000.00, 40, 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800', ARRAY['https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800'], 1, true),
-('Casual T-Shirt', 'casual-t-shirt', 'Comfortable cotton t-shirt available in multiple colors', 150000.00, 100, 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800', ARRAY['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800'], 2, true),
-('Denim Jeans', 'denim-jeans', 'Classic denim jeans with modern fit', 350000.00, 75, 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=800', ARRAY['https://images.unsplash.com/photo-1542272604-787c3835535d?w=800'], 2, true),
-('Coffee Table', 'coffee-table', 'Modern wooden coffee table for living room', 2000000.00, 15, 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=800', ARRAY['https://images.unsplash.com/photo-1533090161767-e6ffed986c88?w=800'], 3, true),
-('Table Lamp', 'table-lamp', 'Elegant table lamp with adjustable brightness', 500000.00, 35, 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800', ARRAY['https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=800'], 3, true),
-('Programming Book', 'programming-book', 'Complete guide to modern web development', 250000.00, 60, 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=800', ARRAY['https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=800'], 4, true),
-('Yoga Mat', 'yoga-mat', 'Non-slip yoga mat for comfortable exercise', 300000.00, 45, 'https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=800', ARRAY['https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=800'], 5, true);
-
--- Insert sample admin user (password: admin123)
--- Hash generated with bcrypt, rounds=10
-INSERT INTO users (name, email, password, role) VALUES
-('Admin User', 'admin@bazarsip.com', '$2b$10$rKqVFvHvVZEPQNmqVxN0i.mxqJFvQJLqvCQXk7P8S3f5YGV9FqL8K', 'admin');
-
--- Insert sample customer user (password: customer123)
-INSERT INTO users (name, email, password, role) VALUES
-('John Doe', 'customer@bazarsip.com', '$2b$10$t3vqR1IbGrP1mxVXJhQNAuqPh7GdXVLvL3k9qP7GdXVLvL3k9qP7G', 'customer');
+-- No seed users. Register the first account through /register, then promote
+-- it from psql:
+--
+--   UPDATE users SET role = 'admin' WHERE email = 'you@example.com';
+--
+-- Seeding a password hash here would mean shipping a known credential.
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
