@@ -2,6 +2,33 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 
+const VALID_ROLES = ["customer", "admin"];
+
+// Returns a reason string when the change would remove the caller's own
+// access or leave the shop with no admin at all, otherwise null.
+async function wouldLockOutAdmins(
+  targetId: string,
+  callerId: number,
+): Promise<string | null> {
+  if (String(callerId) === String(targetId)) {
+    return "You cannot remove your own access";
+  }
+
+  const target = await pool.query("SELECT role FROM users WHERE id = $1", [
+    targetId,
+  ]);
+
+  if (target.rows[0]?.role !== "admin") {
+    return null;
+  }
+
+  const admins = await pool.query(
+    "SELECT COUNT(*)::int AS count FROM users WHERE role = 'admin'",
+  );
+
+  return admins.rows[0].count <= 1 ? "This is the last admin account" : null;
+}
+
 // PUT - Admin only
 export async function PUT(
   req: NextRequest,
@@ -17,6 +44,23 @@ export async function PUT(
     const { id } = await params;
     const body = await req.json();
     const { role, name, email } = body;
+
+    if (role !== undefined && !VALID_ROLES.includes(role)) {
+      return NextResponse.json(
+        { success: false, error: `Role must be one of: ${VALID_ROLES.join(", ")}` },
+        { status: 400 },
+      );
+    }
+
+    if (role !== undefined && role !== "admin") {
+      const lockout = await wouldLockOutAdmins(id, authResult.user.userId);
+      if (lockout) {
+        return NextResponse.json(
+          { success: false, error: lockout },
+          { status: 400 },
+        );
+      }
+    }
 
     const updates: string[] = [];
     const values: any[] = [];
@@ -109,7 +153,32 @@ export async function DELETE(
       );
     }
 
-    // Delete user (CASCADE will delete related data)
+    const lockout = await wouldLockOutAdmins(id, authResult.user.userId);
+    if (lockout) {
+      return NextResponse.json(
+        { success: false, error: lockout },
+        { status: 400 },
+      );
+    }
+
+    // orders.user_id cascades, so deleting a customer would take their whole
+    // order history — and the sales figures — with it.
+    const orders = await pool.query(
+      "SELECT 1 FROM orders WHERE user_id = $1 LIMIT 1",
+      [id],
+    );
+
+    if (orders.rows.length > 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "This user has orders. Deleting them would erase that sales history.",
+        },
+        { status: 409 },
+      );
+    }
+
     await pool.query("DELETE FROM users WHERE id = $1", [id]);
 
     return NextResponse.json({
