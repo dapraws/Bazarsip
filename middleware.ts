@@ -24,8 +24,10 @@ export async function middleware(request: NextRequest) {
   // Customers arrive from a WhatsApp link, and requiring an account before
   // they can see a single item would stop them there — and leave search
   // engines with nothing to index.
+  // /cart is absent too: it lives entirely in localStorage, so there is
+  // nothing to protect, and bouncing someone who just tapped "add to cart"
+  // rejects them one step before the place identity is actually needed.
   const customerPaths = [
-    "/cart",
     "/checkout",
     "/my-orders",
     "/profile",
@@ -82,7 +84,6 @@ export const config = {
     "/suppliers/:path*",
 
     // Customer Routes
-    "/cart/:path*",
     "/checkout/:path*",
     "/my-orders/:path*",
     "/profile/:path*",
