@@ -3,15 +3,23 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/ui/ImageUpload";
+import { whatsappLink } from "@/lib/whatsapp";
 
 interface Category {
   id: number;
   name: string;
 }
 
+interface Supplier {
+  id: number;
+  name: string;
+  whatsapp: string | null;
+}
+
 export default function NewProductPage() {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
@@ -23,10 +31,13 @@ export default function NewProductPage() {
     image_url: "",
     images: [] as string[],
     is_active: true,
+    supplier_id: "",
+    availability: "ready",
   });
 
   useEffect(() => {
     fetchCategories();
+    fetchSuppliers();
   }, []);
 
   async function fetchCategories() {
@@ -36,6 +47,21 @@ export default function NewProductPage() {
       if (data.success) setCategories(data.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
+    }
+  }
+
+  const supplierChat = whatsappLink(
+    suppliers.find((s) => String(s.id) === formData.supplier_id)?.whatsapp ??
+      null,
+  );
+
+  async function fetchSuppliers() {
+    try {
+      const res = await fetch("/api/suppliers");
+      const data = await res.json();
+      if (data.success) setSuppliers(data.data);
+    } catch (error) {
+      console.error("Error fetching suppliers:", error);
     }
   }
 
@@ -57,6 +83,10 @@ export default function NewProductPage() {
           image_url: formData.image_url || null,
           images: formData.images.filter((img) => img.trim() !== ""),
           is_active: formData.is_active,
+          supplier_id: formData.supplier_id
+            ? parseInt(formData.supplier_id)
+            : null,
+          availability: formData.availability,
         }),
       });
 
@@ -207,6 +237,84 @@ export default function NewProductPage() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Supplier */}
+          <div>
+            <label
+              htmlFor="supplier"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Supplier
+            </label>
+            <select
+              id="supplier"
+              value={formData.supplier_id}
+              onChange={(e) =>
+                setFormData({ ...formData, supplier_id: e.target.value })
+              }
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Belum diisi</option>
+              {suppliers.map((supplier) => (
+                <option key={supplier.id} value={supplier.id}>
+                  {supplier.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Tempat kulakan barang ini, biar gampang saat mau restock.
+            </p>
+
+            {supplierChat && (
+              <a
+                href={supplierChat}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+              >
+                Chat supplier di WhatsApp
+              </a>
+            )}
+          </div>
+
+          {/* Availability */}
+          <div>
+            <span className="block text-sm font-medium text-gray-700 mb-2">
+              Ketersediaan
+            </span>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { value: "ready", label: "Ready", hint: "Barang ada di rumah" },
+                { value: "preorder", label: "Pre-order", hint: "Ambil ke supplier dulu" },
+              ].map((option) => (
+                <label
+                  key={option.value}
+                  className={`border rounded-lg p-3 cursor-pointer transition-colors ${
+                    formData.availability === option.value
+                      ? "border-blue-600 bg-blue-50"
+                      : "border-gray-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="availability"
+                    value={option.value}
+                    checked={formData.availability === option.value}
+                    onChange={(e) =>
+                      setFormData({ ...formData, availability: e.target.value })
+                    }
+                    className="sr-only"
+                  />
+                  <span className="block font-medium text-gray-900">
+                    {option.label}
+                  </span>
+                  <span className="block text-xs text-gray-500 mt-0.5">
+                    {option.hint}
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
 
           {/* Main Image — Cloudinary Upload */}

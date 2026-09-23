@@ -18,6 +18,7 @@ export async function middleware(request: NextRequest) {
     "/categories",
     "/orders",
     "/products",
+    "/suppliers",
   ];
   const customerPaths = [
     "/shop",
@@ -75,6 +76,7 @@ export const config = {
     "/categories/:path*",
     "/orders/:path*",
     "/products/:path*",
+    "/suppliers/:path*",
 
     // Customer Routes
     "/shop/:path*",

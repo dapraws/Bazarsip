@@ -86,7 +86,8 @@ export default function ImageUpload({
         uploadSignature: generateSignature,
         folder,
         multiple,
-        maxFiles: multiple ? 10 : 1,
+        // Catalogue photos are picked in bulk straight from the phone gallery.
+        maxFiles: multiple ? 30 : 1,
         sources: ["local", "url", "camera"],
         resourceType: "image",
         clientAllowedFormats: ["jpg", "jpeg", "png", "webp", "avif"],
