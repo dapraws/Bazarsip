@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
+import { slugify, nextFreeSlug } from "@/lib/slug";
 
 // GET - Public route (no auth required)
 export async function GET(req: NextRequest) {
@@ -106,21 +107,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate slug if not provided
-    const productSlug = slug || name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-
-    // Check if slug exists
-    const slugCheck = await pool.query(
-      "SELECT id FROM products WHERE slug = $1",
-      [productSlug],
+    // Two items can legitimately share a name, so collisions get a numeric
+    // suffix rather than an error the seller has to resolve.
+    const slugBase = slugify(slug || name);
+    const slugsInUse = await pool.query(
+      "SELECT slug FROM products WHERE slug = $1 OR slug LIKE $1 || '-%'",
+      [slugBase],
     );
 
-    if (slugCheck.rows.length > 0) {
-      return NextResponse.json(
-        { success: false, error: "Product with this slug already exists" },
-        { status: 409 },
-      );
-    }
+    const productSlug = nextFreeSlug(
+      slugBase,
+      slugsInUse.rows.map((row) => row.slug),
+    );
 
     const result = await pool.query(
       `INSERT INTO products (name, slug, description, price, stock, image_url, images, category_id, is_active)

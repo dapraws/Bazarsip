@@ -387,7 +387,7 @@ function ProductCard({ p }: { p: Product }) {
 
       <div className="mt-3">
         <Link
-          href={`/shop/${p.id}`}
+          href={`/shop/${p.slug}`}
           className="text-[11px] font-semibold tracking-wide text-neutral-800 hover:underline"
         >
           {p.name}

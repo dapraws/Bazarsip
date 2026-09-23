@@ -346,7 +346,7 @@ function ProductMiniCard({ p }: { p: Product }) {
         </div>
 
         <Link
-          href={`/shop/${p.id}`}
+          href={`/shop/${p.slug}`}
           className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-neutral-900 py-2 text-xs font-semibold text-white hover:bg-neutral-800"
         >
           View Detail

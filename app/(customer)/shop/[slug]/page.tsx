@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export default function ProductDetailPage({ params }: PageProps) {
@@ -14,25 +14,25 @@ export default function ProductDetailPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState("");
-  const [productId, setProductId] = useState<string>("");
+  const [productSlug, setProductSlug] = useState<string>("");
 
   useEffect(() => {
     async function loadParams() {
       const resolvedParams = await params;
-      setProductId(resolvedParams.id);
+      setProductSlug(resolvedParams.slug);
     }
     loadParams();
   }, [params]);
 
   useEffect(() => {
-    if (productId) {
+    if (productSlug) {
       fetchProduct();
     }
-  }, [productId]);
+  }, [productSlug]);
 
   async function fetchProduct() {
     try {
-      const res = await fetch(`/api/products/${productId}`);
+      const res = await fetch(`/api/products/${productSlug}`);
       const data = await res.json();
       if (data.success) {
         setProduct(data.data);

@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 
+// Public URLs address products and categories by slug; the admin UI still
+// links by id. slugify() never produces a purely numeric slug, so a numeric
+// segment is unambiguously an id.
+function byIdOrSlug(param: string, column: string) {
+  return /^\d+$/.test(param)
+    ? { clause: `${column}.id = $1`, value: Number(param) }
+    : { clause: `${column}.slug = $1`, value: param };
+}
+
 // GET - Public route
 export async function GET(
   req: NextRequest,
@@ -9,13 +18,14 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const lookup = byIdOrSlug(id, "p");
 
     const result = await pool.query(
       `SELECT p.*, c.name as category_name, c.slug as category_slug
        FROM products p
        LEFT JOIN categories c ON p.category_id = c.id
-       WHERE p.id = $1`,
-      [id],
+       WHERE ${lookup.clause}`,
+      [lookup.value],
     );
 
     if (result.rows.length === 0) {
