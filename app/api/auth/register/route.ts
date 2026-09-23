@@ -1,9 +1,24 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { pool } from "@/lib/db";
+import { createRateLimiter } from "@/lib/rate-limit";
+import { clientIp } from "@/lib/request";
 
-export async function POST(req: Request) {
+// Signup is open to anyone, so it is throttled per address to keep the user
+// table from being filled by a script.
+const registerLimiter = createRateLimiter(5, 60 * 60 * 1000);
+
+export async function POST(req: NextRequest) {
   try {
+    const { allowed, retryAfter } = registerLimiter.hit(clientIp(req));
+
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many sign-ups from this address. Try again later." },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } },
+      );
+    }
+
     const { email, password, name } = await req.json();
 
     // Validate input

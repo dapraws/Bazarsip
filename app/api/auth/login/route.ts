@@ -1,9 +1,34 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { pool } from "@/lib/db";
+import { createRateLimiter } from "@/lib/rate-limit";
+import { clientIp } from "@/lib/request";
 
-export async function POST(req: Request) {
+// Only failures count, so someone signing in repeatedly is never locked out
+// by their own success.
+const loginLimiter = createRateLimiter(5, 15 * 60 * 1000);
+
+function rejectOrThrottle(key: string) {
+  const { allowed, retryAfter } = loginLimiter.hit(key);
+
+  if (!allowed) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Too many attempts. Please try again later.",
+      },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } },
+    );
+  }
+
+  return NextResponse.json(
+    { success: false, error: "Invalid credentials" },
+    { status: 401 },
+  );
+}
+
+export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json();
 
@@ -14,27 +39,36 @@ export async function POST(req: Request) {
       );
     }
 
+    const limiterKey = `${clientIp(req)}:${String(email).toLowerCase()}`;
+    const throttled = loginLimiter.isBlocked(limiterKey);
+
+    if (throttled.blocked) {
+      return NextResponse.json(
+        { success: false, error: "Too many attempts. Please try again later." },
+        {
+          status: 429,
+          headers: { "Retry-After": String(throttled.retryAfter) },
+        },
+      );
+    }
+
     const userRes = await pool.query(
       "SELECT id, email, name, role, password FROM users WHERE email = $1",
       [email],
     );
 
     if (userRes.rows.length === 0) {
-      return NextResponse.json(
-        { success: false, error: "Invalid credentials" },
-        { status: 401 },
-      );
+      return rejectOrThrottle(limiterKey);
     }
 
     const user = userRes.rows[0];
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {
-      return NextResponse.json(
-        { success: false, error: "Invalid credentials" },
-        { status: 401 },
-      );
+      return rejectOrThrottle(limiterKey);
     }
+
+    loginLimiter.reset(limiterKey);
 
     const token = jwt.sign(
       {
