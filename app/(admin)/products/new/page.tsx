@@ -334,7 +334,7 @@ export default function NewProductPage() {
             </div>
           </div>
 
-          {/* Browsing axes — all optional */}
+          {/* Browsing axes: all optional */}
           <div className="space-y-5 rounded-lg border border-gray-200 p-4">
             <FacetPicker
               label="Untuk siapa"
@@ -380,7 +380,7 @@ export default function NewProductPage() {
             </div>
           </div>
 
-          {/* Main Image — Cloudinary Upload */}
+          {/* Main Image: Cloudinary Upload */}
           <ImageUpload
             folder="bazarsip/products"
             label="Foto Utama"
@@ -392,7 +392,7 @@ export default function NewProductPage() {
             multiple={false}
           />
 
-          {/* Gallery Images — Cloudinary Upload */}
+          {/* Gallery Images: Cloudinary Upload */}
           <ImageUpload
             folder="bazarsip/products"
             label="Foto Lainnya"

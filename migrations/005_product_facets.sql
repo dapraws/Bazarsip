@@ -39,7 +39,7 @@ CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand);
 
 -- Categories become item type only. Olahraga and Formal move to the style
 -- column; Topi was missing. Safe to delete outright because no product
--- references them yet — if that changes, reassign before running this.
+-- references them yet: if that changes, reassign before running this.
 DELETE FROM categories WHERE slug IN ('olahraga', 'formal');
 
 INSERT INTO categories (name, slug, description)

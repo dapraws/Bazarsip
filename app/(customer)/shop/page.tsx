@@ -56,7 +56,7 @@ export default function ShopPage() {
   const [ageGroup, setAgeGroup] = useState("");
   const [style, setStyle] = useState("");
   // The control is a single max-price slider, not a range. At the top of the
-  // scale it means "no limit" and the filter is not sent at all — otherwise
+  // scale it means "no limit" and the filter is not sent at all: otherwise
   // the default would quietly hide everything cheaper than the starting
   // value, which is most of the catalogue.
   const PRICE_CEILING = 2_000_000;

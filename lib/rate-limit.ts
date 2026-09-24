@@ -10,7 +10,7 @@ export interface RateLimiter {
   hit(key: string, now?: number): { allowed: boolean; retryAfter: number };
   /** Reads the current state without recording a hit. */
   isBlocked(key: string, now?: number): { blocked: boolean; retryAfter: number };
-  /** Clears a key — call on success so a good login resets the count. */
+  /** Clears a key: call on success so a good login resets the count. */
   reset(key: string): void;
 }
 

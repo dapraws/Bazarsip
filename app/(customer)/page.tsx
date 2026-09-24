@@ -58,7 +58,7 @@ export default async function LandingPage() {
             </h1>
 
             <p className="mt-4 max-w-xl text-sm text-white/80">
-              Koleksi anak, remaja, dan dewasa — merk maupun non-merk. Pilih
+              Koleksi anak, remaja, dan dewasa, merk maupun non-merk. Pilih
               yang cocok, tanya-tanya dulu juga boleh.
             </p>
 
@@ -354,7 +354,7 @@ function TestimonialCard({ active, name }: { active: boolean; name: string }) {
  *
  * This is a server component, so it reads the database directly rather than
  * calling its own API over HTTP. The previous version built a URL from
- * NEXT_PUBLIC_APP_URL — a variable that is not set anywhere — and so always
+ * NEXT_PUBLIC_APP_URL: a variable that is not set anywhere: and so always
  * fell back to a hardcoded http://localhost:3000, which fails on any host
  * that does not happen to serve on that port.
  */

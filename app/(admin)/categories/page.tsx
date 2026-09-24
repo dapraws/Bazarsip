@@ -300,7 +300,7 @@ export default function AdminCategoriesPage() {
                   />
                 </div>
 
-                {/* Category Image — Cloudinary Upload */}
+                {/* Category Image: Cloudinary Upload */}
                 <ImageUpload
                   folder="bazarsip/categories"
                   label="Foto Kategori"

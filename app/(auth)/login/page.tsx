@@ -16,6 +16,7 @@ export default function LoginPage() {
   // permits one thing, submitting a code, and expires in minutes.
   const [challenge, setChallenge] = useState("");
   const [code, setCode] = useState("");
+  const [remember, setRemember] = useState(true);
 
   // The server sets the session as an httpOnly cookie. Writing it from here
   // would create a second copy that scripts can read, which is exactly what
@@ -66,7 +67,7 @@ export default function LoginPage() {
       const res = await fetch("/api/auth/2fa/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ challenge, code }),
+        body: JSON.stringify({ challenge, code, remember }),
       });
 
       const data = await res.json();
@@ -108,6 +109,21 @@ export default function LoginPage() {
           placeholder="000000"
           className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-2xl tracking-[0.4em] focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
+        <label className="flex items-start gap-3 text-sm text-gray-700">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600"
+          />
+          <span>
+            Ingat HP ini selama 30 hari
+            <span className="block text-xs text-gray-500">
+              Jangan dicentang kalau ini bukan perangkatmu sendiri.
+            </span>
+          </span>
+        </label>
 
         <button
           type="submit"

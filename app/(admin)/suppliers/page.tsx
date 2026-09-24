@@ -245,7 +245,7 @@ export default function AdminSuppliersPage() {
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Boleh ditulis bebas — 0812…, +62…, atau 812… sama saja.
+                  Boleh ditulis bebas: 0812…, +62…, atau 812… sama saja.
                 </p>
               </div>
 

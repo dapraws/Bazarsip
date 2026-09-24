@@ -2,6 +2,7 @@
 -- PostgreSQL version
 
 -- Drop tables if they exist (for fresh start)
+DROP TABLE IF EXISTS trusted_devices CASCADE;
 DROP TABLE IF EXISTS audit_log CASCADE;
 DROP TABLE IF EXISTS order_items CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
@@ -142,7 +143,7 @@ CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX idx_users_email ON users(email);
 
--- Starter categories. Item type only — who a product is for, what age, what
+-- Starter categories. Item type only: who a product is for, what age, what
 -- style and which brand are separate columns on products, so an item can be
 -- found through any of them rather than being filed under just one.
 INSERT INTO categories (name, slug, description) VALUES
@@ -159,6 +160,23 @@ INSERT INTO categories (name, slug, description) VALUES
 --   UPDATE users SET role = 'admin' WHERE email = 'you@example.com';
 --
 -- Seeding a password hash here would mean shipping a known credential.
+
+-- Browsers allowed to skip the second factor for a while.
+--
+-- The token is stored hashed because it bypasses two-factor: a leaked
+-- database must not hand anyone a working device.
+CREATE TABLE trusted_devices (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash TEXT NOT NULL,
+    label VARCHAR(120),
+    expires_at TIMESTAMP NOT NULL,
+    last_used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_trusted_devices_user ON trusted_devices(user_id);
+CREATE INDEX idx_trusted_devices_expires ON trusted_devices(expires_at);
 
 -- Audit log: who changed what.
 --

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 /**
  * Clears the session.
  *
- * The cookie is httpOnly, so scripts cannot remove it — `document.cookie =
+ * The cookie is httpOnly, so scripts cannot remove it: `document.cookie =
  * "session="` silently does nothing and leaves the visitor signed in. Only
  * the server can expire it.
  */

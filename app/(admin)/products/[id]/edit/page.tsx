@@ -395,7 +395,7 @@ export default function EditProductPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Browsing axes — all optional */}
+          {/* Browsing axes: all optional */}
           <div className="space-y-5 rounded-lg border border-gray-200 p-4">
             <FacetPicker
               label="Untuk siapa"
@@ -441,7 +441,7 @@ export default function EditProductPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Main Image — Cloudinary Upload */}
+          {/* Main Image: Cloudinary Upload */}
           <ImageUpload
             folder="bazarsip/products"
             label="Foto Utama"
@@ -453,7 +453,7 @@ export default function EditProductPage({ params }: PageProps) {
             multiple={false}
           />
 
-          {/* Gallery Images — Cloudinary Upload */}
+          {/* Gallery Images: Cloudinary Upload */}
           <ImageUpload
             folder="bazarsip/products"
             label="Foto Lainnya"

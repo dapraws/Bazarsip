@@ -34,7 +34,7 @@ assert.equal(r.hit("c", t).allowed, true, "reset clears the count");
 
 console.log("ok - rate limiter windows, isolation and reset");
 
-// A blocked key stays blocked no matter what the caller does next — the
+// A blocked key stays blocked no matter what the caller does next: the
 // check must not depend on the attempt failing.
 const g = createRateLimiter(2, WINDOW);
 g.hit("d", t);

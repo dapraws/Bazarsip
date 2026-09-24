@@ -1,7 +1,7 @@
 import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 
 /**
- * TOTP (RFC 6238) — the six-digit codes an authenticator app shows.
+ * TOTP (RFC 6238): the six-digit codes an authenticator app shows.
  *
  * Nothing is ever sent to the phone. The server and the app hold the same
  * secret, both divide the clock into 30-second steps, and both compute
@@ -96,7 +96,7 @@ export function currentStep(now: number = Date.now()): number {
  * step each way is the usual compromise: a wider window is easier to guess
  * against, a narrower one rejects honest users.
  *
- * Returns the matched step so the caller can refuse to accept it twice — a
+ * Returns the matched step so the caller can refuse to accept it twice: a
  * code shoulder-surfed or phished is otherwise replayable for its full
  * lifetime.
  */

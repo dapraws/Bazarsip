@@ -4,6 +4,7 @@ import { pool } from "@/lib/db";
 import { requireAuth } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 import { clientIp } from "@/lib/request";
+import { revokeAllDevices } from "@/lib/trusted-device";
 
 export async function POST(req: NextRequest) {
   const authResult = await requireAuth(req, "admin");
@@ -38,6 +39,10 @@ export async function POST(req: NextRequest) {
        WHERE id = $1`,
       [authResult.user.userId],
     );
+
+    // A remembered browser is a standing pass through the second factor.
+    // Turning the factor off must not leave those passes lying around.
+    await revokeAllDevices(authResult.user.userId);
 
     await logAudit({
       action: "totp_disabled",

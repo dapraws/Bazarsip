@@ -2,8 +2,8 @@
  * Normalises an Indonesian phone number to the digits-only form wa.me wants,
  * e.g. "0812-3456-789" and "+62 812 3456 789" both become "628123456789".
  *
- * Suppliers get written down however they were received — pasted from a chat,
- * copied off a business card, typed from memory — so the input is cleaned
+ * Suppliers get written down however they were received: pasted from a chat,
+ * copied off a business card, typed from memory: so the input is cleaned
  * rather than rejected. Returns null when there is not enough left to dial.
  */
 export function normalizeWhatsapp(input: string | null): string | null {

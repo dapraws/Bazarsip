@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
   ];
   // /shop is deliberately absent: the catalogue is the point of the site.
   // Customers arrive from a WhatsApp link, and requiring an account before
-  // they can see a single item would stop them there — and leave search
+  // they can see a single item would stop them there: and leave search
   // engines with nothing to index.
   // /cart is absent too: it lives entirely in localStorage, so there is
   // nothing to protect, and bouncing someone who just tapped "add to cart"

@@ -6,7 +6,7 @@
 --
 -- Categories are by item type only. The catalogue also varies by audience
 -- (anak / remaja / dewasa) and by branded vs unbranded, but products carry
--- exactly one category, so those axes need a separate field — worth adding
+-- exactly one category, so those axes need a separate field: worth adding
 -- once there is enough real stock to see how it is actually browsed.
 --
 -- Apply:

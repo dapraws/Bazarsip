@@ -20,8 +20,8 @@ export function slugify(input: string): string {
 /**
  * Returns `base`, or `base-2`, `base-3`... when it is already taken.
  *
- * Two products genuinely can share a name — the same plain tee from two
- * suppliers — so a collision should not be an error the seller has to solve.
+ * Two products genuinely can share a name: the same plain tee from two
+ * suppliers: so a collision should not be an error the seller has to solve.
  */
 export function nextFreeSlug(base: string, taken: string[]): string {
   const used = new Set(taken);

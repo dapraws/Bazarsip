@@ -32,7 +32,7 @@ export function paymentStatusLabel(value: string) {
 
 /**
  * Product facets. Type lives in `categories`; these are the other axes a
- * buyer browses by. All of them are optional on a product — the seller
+ * buyer browses by. All of them are optional on a product: the seller
  * fills in what applies and leaves the rest.
  */
 export const GENDERS = ["pria", "wanita", "unisex"] as const;
@@ -83,6 +83,7 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   user_delete: "Hapus pengguna",
   totp_enabled: "Aktifkan verifikasi 2 langkah",
   totp_disabled: "Matikan verifikasi 2 langkah",
+  totp_devices_revoked: "Lupakan perangkat tepercaya",
 };
 
 export function auditActionLabel(value: string) {

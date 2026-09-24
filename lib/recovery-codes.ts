@@ -32,7 +32,7 @@ export async function hashRecoveryCodes(codes: string[]): Promise<string[]> {
 /**
  * Finds and consumes a matching code.
  *
- * Returns the remaining hashes so the caller can store them back — a
+ * Returns the remaining hashes so the caller can store them back: a
  * recovery code that still worked after being used would not be a recovery
  * code, it would be a second password.
  */

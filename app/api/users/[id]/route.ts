@@ -172,7 +172,7 @@ export async function DELETE(
     }
 
     // orders.user_id cascades, so deleting a customer would take their whole
-    // order history — and the sales figures — with it.
+    // order history: and the sales figures: with it.
     const orders = await pool.query(
       "SELECT 1 FROM orders WHERE user_id = $1 LIMIT 1",
       [id],

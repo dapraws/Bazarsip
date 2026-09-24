@@ -6,6 +6,7 @@ import { issueSession, readChallenge } from "@/lib/session";
 import { createRateLimiter } from "@/lib/rate-limit";
 import { clientIp } from "@/lib/request";
 import { logAudit } from "@/lib/audit";
+import { trustDevice } from "@/lib/trusted-device";
 
 // Six digits is a million combinations, and the drift window accepts three
 // of them at any moment. Without a cap, guessing is a matter of minutes.
@@ -13,7 +14,7 @@ const codeLimiter = createRateLimiter(5, 15 * 60 * 1000);
 
 export async function POST(req: NextRequest) {
   try {
-    const { challenge, code } = await req.json();
+    const { challenge, code, remember } = await req.json();
     const ip = clientIp(req);
 
     const userId = challenge ? readChallenge(challenge) : null;
@@ -72,13 +73,16 @@ export async function POST(req: NextRequest) {
       await logAudit({
         action: "login",
         actor: { userId: user.id, email: user.email },
-        details: { factor: "totp" },
+        details: { factor: "totp", remembered: Boolean(remember) },
         ip,
       });
-      return issueSession(user);
+
+      const session = issueSession(user);
+      if (remember) await trustDevice(user.id, req, session);
+      return session;
     }
 
-    // Not a valid code — it may be a recovery code instead.
+    // Not a valid code: it may be a recovery code instead.
     const recovery = await consumeRecoveryCode(submitted, user.recovery_codes);
     if (recovery.matched) {
       await pool.query("UPDATE users SET recovery_codes = $1 WHERE id = $2", [
@@ -89,10 +93,17 @@ export async function POST(req: NextRequest) {
       await logAudit({
         action: "login",
         actor: { userId: user.id, email: user.email },
-        details: { factor: "recovery_code", remaining: recovery.remaining.length },
+        details: {
+          factor: "recovery_code",
+          remaining: recovery.remaining.length,
+          remembered: Boolean(remember),
+        },
         ip,
       });
-      return issueSession(user);
+
+      const session = issueSession(user);
+      if (remember) await trustDevice(user.id, req, session);
+      return session;
     }
 
     codeLimiter.hit(String(userId));

@@ -14,7 +14,7 @@ const SESSION_DAYS = 7;
  * Issues the signed session cookie.
  *
  * Shared by password login and by two-factor verification so there is
- * exactly one place a session can be minted — two copies drift, and the copy
+ * exactly one place a session can be minted: two copies drift, and the copy
  * that forgets a flag is the one an attacker finds.
  */
 export function issueSession(user: SessionUser) {
@@ -50,7 +50,7 @@ export function issueSession(user: SessionUser) {
  * A short-lived token proving the password step passed, and nothing else.
  *
  * It is deliberately not the session cookie: between the password and the
- * code the caller must be able to do exactly one thing — submit a code. It
+ * code the caller must be able to do exactly one thing: submit a code. It
  * carries its own purpose so a challenge can never be presented as a
  * session, and it expires in minutes rather than days.
  */

@@ -7,7 +7,7 @@ import { clientIp } from "@/lib/request";
 // Admins address orders by id; customers only ever by the public code.
 //
 // Letting a customer look one up by id hands back the sequential primary key,
-// and "my order is 47" discloses roughly how many the shop has taken — the
+// and "my order is 47" discloses roughly how many the shop has taken: the
 // exact thing the random order number exists to hide.
 function orderLookup(param: string, isAdmin: boolean) {
   if (isAdmin && /^\d+$/.test(param)) {

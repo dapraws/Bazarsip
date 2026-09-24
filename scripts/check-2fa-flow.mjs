@@ -65,7 +65,7 @@ assert.equal(probe.status, 403, `challenge must not act as a session (got ${prob
 console.log("6. challenge bukan sesi              OK");
 
 // 7. correct code completes the login
-// Enabling consumed the current step, so use the next one — still inside the
+// Enabling consumed the current step, so use the next one: still inside the
 // drift window, and not yet spent.
 const step = currentStep() + 1;
 const code = generateCode(secret, step);

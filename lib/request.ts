@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
  * Best-effort client address for rate limiting.
  *
  * Behind the reverse proxy this comes from X-Forwarded-For. The header is
- * caller-controlled, so it is only ever used for throttling — never for
+ * caller-controlled, so it is only ever used for throttling: never for
  * authorisation.
  */
 export function clientIp(req: NextRequest): string {

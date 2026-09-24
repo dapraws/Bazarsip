@@ -5,6 +5,7 @@ import { createRateLimiter } from "@/lib/rate-limit";
 import { clientIp } from "@/lib/request";
 import { issueSession, issueChallenge } from "@/lib/session";
 import { logAudit } from "@/lib/audit";
+import { isDeviceTrusted } from "@/lib/trusted-device";
 
 // Only failures count, so someone signing in repeatedly is never locked out
 // by their own success.
@@ -14,7 +15,7 @@ const loginLimiter = createRateLimiter(5, 15 * 60 * 1000);
 // the email and every address gets its own fresh allowance. This caps the
 // total failures from one address regardless of which accounts are tried.
 // The ceiling is generous enough for a household or a shop sharing a
-// connection, and it is not cleared by a success — otherwise an attacker
+// connection, and it is not cleared by a success: otherwise an attacker
 // with one valid account could reset it at will.
 const addressLimiter = createRateLimiter(20, 15 * 60 * 1000);
 
@@ -98,7 +99,7 @@ export async function POST(req: NextRequest) {
     // The password was right, but it is not a session yet. With a second
     // factor on, the caller gets a short-lived challenge that permits one
     // thing: submitting a code.
-    if (user.totp_enabled) {
+    if (user.totp_enabled && !(await isDeviceTrusted(user.id, req))) {
       return NextResponse.json({
         success: true,
         requires2fa: true,

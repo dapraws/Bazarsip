@@ -14,12 +14,23 @@ export default function SecurityPage() {
   const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [devices, setDevices] = useState<
+    { id: number; label: string | null; last_used_at: string }[]
+  >([]);
+
+  async function loadDevices() {
+    const res = await fetch("/api/auth/2fa/devices");
+    const data = await res.json();
+    if (data.success) setDevices(data.data);
+  }
 
   useEffect(() => {
     (async () => {
       const res = await fetch("/api/auth/me");
       const data = await res.json();
-      setStep(data.success && data.user.totp_enabled ? "on" : "off");
+      const on = data.success && data.user.totp_enabled;
+      setStep(on ? "on" : "off");
+      if (on) loadDevices();
     })();
   }, []);
 
@@ -82,6 +93,7 @@ export default function SecurityPage() {
     }
 
     setPassword("");
+    setDevices([]);
     setStep("off");
   }
 
@@ -107,7 +119,7 @@ export default function SecurityPage() {
         {step === "off" && (
           <>
             <p className="text-sm text-gray-700">
-              Belum aktif. Kamu perlu aplikasi authenticator di HP — Google
+              Belum aktif. Kamu perlu aplikasi authenticator di HP, misalnya Google
               Authenticator atau Authy, keduanya gratis.
             </p>
             <button
@@ -187,7 +199,7 @@ export default function SecurityPage() {
             <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-sm text-amber-900">
               <strong>Simpan sekarang.</strong> Kode ini hanya tampil sekali.
               Kalau HP hilang atau ganti, ini satu-satunya jalan masuk. Foto
-              atau tulis di tempat aman — jangan di HP yang sama.
+              atau tulis di tempat aman, jangan di HP yang sama.
             </div>
 
             <ul className="grid grid-cols-2 gap-2 font-mono text-sm">
@@ -210,8 +222,45 @@ export default function SecurityPage() {
         {step === "on" && (
           <form onSubmit={disable} className="space-y-4">
             <p className="text-sm font-medium text-green-700">
-              Aktif. Setiap masuk akan diminta kode dari HP.
+              Aktif. Kode diminta saat masuk dari perangkat baru.
             </p>
+
+            <div className="rounded-lg border border-gray-200 p-3 space-y-2">
+              <p className="text-sm font-medium text-gray-900">
+                Perangkat yang diingat ({devices.length})
+              </p>
+              {devices.length === 0 ? (
+                <p className="text-xs text-gray-500">
+                  Belum ada. Kode akan diminta setiap kali masuk.
+                </p>
+              ) : (
+                <ul className="space-y-1 text-xs text-gray-600">
+                  {devices.map((d) => (
+                    <li key={d.id}>
+                      {d.label ?? "Perangkat"} · terakhir dipakai{" "}
+                      {new Date(d.last_used_at).toLocaleDateString("id-ID")}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <button
+                type="button"
+                disabled={busy || devices.length === 0}
+                onClick={async () => {
+                  setBusy(true);
+                  await fetch("/api/auth/2fa/devices", { method: "DELETE" });
+                  await loadDevices();
+                  setBusy(false);
+                }}
+                className="text-sm text-blue-600 hover:underline disabled:opacity-40 disabled:no-underline"
+              >
+                Lupakan semua perangkat
+              </button>
+              <p className="text-xs text-gray-500">
+                Pakai ini kalau HP hilang. Setelah itu semua perangkat wajib
+                pakai kode lagi.
+              </p>
+            </div>
             <p className="text-sm text-gray-600">
               Untuk mematikan, masukkan kata sandimu.
             </p>

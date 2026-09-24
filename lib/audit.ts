@@ -18,7 +18,8 @@ export type AuditAction =
   | "user_role_change"
   | "user_delete"
   | "totp_enabled"
-  | "totp_disabled";
+  | "totp_disabled"
+  | "totp_devices_revoked";
 
 interface AuditEntry {
   action: AuditAction;
@@ -34,7 +35,7 @@ interface AuditEntry {
  *
  * Never throws: an audit write that fails must not take the actual operation
  * down with it. A missing line is bad, a failed sale because logging broke is
- * worse — the failure goes to the server log instead.
+ * worse: the failure goes to the server log instead.
  *
  * The actor's email is stored alongside the id because the id is set to NULL
  * if that user is ever deleted, and a trail that disappears with the person
