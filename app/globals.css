@@ -3,6 +3,14 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /*
+   * Native controls (select, checkbox, date picker, scrollbars) follow the
+   * operating system unless told otherwise. On a phone set to dark mode the
+   * sort dropdown rendered as dark chrome with near-black text on the light
+   * page around it.
+   */
+  color-scheme: light;
 }
 
 @theme inline {
@@ -12,13 +20,14 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/*
+ * No dark theme. Every screen is written with light Tailwind colours
+ * (bg-white, text-gray-900) and nothing in the app carries a dark: variant,
+ * so flipping --foreground on prefers-color-scheme turned every element
+ * without an explicit text colour into near-white text on a white card.
+ * Labels like "Kategori" and the filter headings disappeared entirely for
+ * anyone whose phone was set to dark mode.
+ */
 body {
   background: var(--background);
   color: var(--foreground);

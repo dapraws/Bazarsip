@@ -162,7 +162,7 @@ export default function ShopPage() {
               setSort(e.target.value as SortOption);
               setPage(1);
             }}
-            className="rounded-xl border bg-yellow-950 text-white-950 py-2 text-sm"
+            className="rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm text-neutral-900"
           >
             <option value="price_asc">Harga: Termurah</option>
             <option value="price_desc">Harga: Termahal</option>

@@ -43,23 +43,64 @@ export default function ImageUpload({
       ? [value as string]
       : [];
 
+  // The widget is built once and kept, so its callback would otherwise close
+  // over whatever the props were at that moment. Picking ten photos fires ten
+  // success events; reading a captured array each time meant nine of them
+  // were overwritten and only the last survived.
+  const imagesRef = useRef(images);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  // Resync only once the parent has caught up, so a render in the middle of
+  // a batch cannot roll the accumulator back.
+  if (images.length >= imagesRef.current.length) {
+    imagesRef.current = images;
+  }
+
   useEffect(() => {
     if (window.cloudinary) {
       setScriptLoaded(true);
       return;
     }
+
+    // The product form renders two uploaders. Without this check the second
+    // one starts a duplicate download of the same 300KB bundle, because the
+    // first has not finished defining window.cloudinary yet.
+    const SRC = "https://upload-widget.cloudinary.com/global/all.js";
+    const existing = document.querySelector<HTMLScriptElement>(
+      `script[src="${SRC}"]`,
+    );
+
+    if (existing) {
+      existing.addEventListener("load", () => setScriptLoaded(true));
+      return;
+    }
+
     const script = document.createElement("script");
-    script.src = "https://upload-widget.cloudinary.com/global/all.js";
+    script.src = SRC;
     script.async = true;
     script.onload = () => setScriptLoaded(true);
     document.body.appendChild(script);
   }, []);
 
+  // The widget now outlives a single open, so it has to be cleaned up when
+  // the form goes away, otherwise its iframe stays behind.
+  useEffect(() => {
+    return () => {
+      widgetRef.current?.destroy?.();
+      widgetRef.current = null;
+    };
+  }, []);
+
   function openWidget() {
     if (!scriptLoaded || !window.cloudinary) return;
 
+    // Reuse it. Destroying and rebuilding on every open tears down and
+    // recreates the widget's iframe, which is what made adding photos feel
+    // slow on a phone.
     if (widgetRef.current) {
-      widgetRef.current.destroy();
+      widgetRef.current.open();
+      return;
     }
 
     async function generateSignature(
@@ -121,10 +162,18 @@ export default function ImageUpload({
 
         if (result.event === "success") {
           const newUrl: string = result.info.secure_url;
+
           if (multiple) {
-            onChange([...images, newUrl]);
+            // Advance the ref here rather than waiting for the next render.
+            // Selecting five photos fires five events in the same tick, so
+            // React has not re-rendered between them; reading the rendered
+            // value each time would rebuild the list from the same starting
+            // point and keep only the last upload.
+            const next = [...imagesRef.current, newUrl];
+            imagesRef.current = next;
+            onChangeRef.current(next);
           } else {
-            onChange(newUrl);
+            onChangeRef.current(newUrl);
           }
         }
       },
