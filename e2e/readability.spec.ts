@@ -16,13 +16,15 @@ test.describe("teks terbaca di mode gelap", () => {
 
   test("label penyaring di halaman toko", async ({ page }) => {
     await page.goto("/shop");
-    await page.waitForSelector("text=Kategori");
+    await page.waitForSelector("text=Untuk siapa");
 
     await expectReadable(page, "body", "teks body");
 
     for (const label of ["Saring", "Kategori", "Untuk siapa", "Usia", "Gaya"]) {
-      const selector = `xpath=//*[normalize-space(text())="${label}"]`;
-      const el = page.locator(selector).first();
+      // "Kategori" also names a navbar dropdown that is hidden at phone
+      // width, so the search is scoped to the filter sidebar.
+      const selector = `xpath=.//*[normalize-space(text())="${label}"]`;
+      const el = page.locator("aside").locator(selector).first();
       await expect(el, `label "${label}" hilang`).toBeVisible();
 
       const colors = await el.evaluate((node) => {

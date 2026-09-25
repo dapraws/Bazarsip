@@ -11,10 +11,25 @@ export async function login(
   who: { email: string; password: string },
 ) {
   await page.goto("/login");
-  await page.getByPlaceholder("nama@email.com").fill(who.email);
-  await page.getByPlaceholder("Kata sandi").fill(who.password);
-  await page.getByRole("button", { name: "Masuk" }).click();
-  await page.waitForURL(/\/(dashboard|shop)/);
+
+  // The inputs are controlled. Typing before hydration writes to the DOM,
+  // then React hydrates and resets them to its own empty state, so the form
+  // submits with required fields blank and never calls the API at all.
+  // Waiting for network idle does not help, because the dev server holds an
+  // HMR socket open. Refill and click until the API answers.
+  await expect(async () => {
+    await page.getByPlaceholder("nama@email.com").fill(who.email);
+    await page.getByPlaceholder("Kata sandi").fill(who.password);
+    await page.getByRole("button", { name: "Masuk" }).click();
+    await page.waitForResponse(
+      (r) => r.url().includes("/api/auth/login") && r.status() === 200,
+      { timeout: 3_000 },
+    );
+  }).toPass({ timeout: 30_000 });
+
+  // Separate wait: under `next dev` the destination is compiled on first
+  // visit, which takes far longer than the click itself.
+  await page.waitForURL(/\/(dashboard|shop)/, { timeout: 60_000 });
 }
 
 /** WCAG relative luminance. */

@@ -3,7 +3,7 @@ import { login, ADMIN } from "./helpers";
 
 const NAME = `Uji Playwright ${Date.now()}`;
 
-test("menambah produk lengkap dari layar ponsel", async ({ page, request }) => {
+test("menambah produk lengkap dari layar ponsel", async ({ page }) => {
   await login(page, ADMIN);
   await page.goto("/products/new");
 
@@ -25,7 +25,9 @@ test("menambah produk lengkap dari layar ponsel", async ({ page, request }) => {
   await page.getByRole("button", { name: "Simpan Produk" }).click();
   await page.waitForURL("**/products");
 
-  const res = await request.get(`/api/products?search=${encodeURIComponent(NAME)}`);
+  const res = await page.request.get(
+    `/api/products?search=${encodeURIComponent(NAME)}`,
+  );
   const body = await res.json();
   const created = body.data.find((p: { name: string }) => p.name === NAME);
 
@@ -35,6 +37,8 @@ test("menambah produk lengkap dari layar ponsel", async ({ page, request }) => {
   expect(created.style).toBe("formal");
   expect(created.brand).toBe("Tanpa merk");
   expect(Number(created.price)).toBe(125000);
+
+  // The row is removed by the global teardown.
 });
 
 test("chip bisa dikosongkan lagi", async ({ page }) => {
@@ -50,18 +54,4 @@ test("chip bisa dikosongkan lagi", async ({ page }) => {
     chip,
     "mengetuk chip aktif harus mengosongkannya",
   ).toHaveAttribute("aria-pressed", "false");
-});
-
-test.afterAll(async ({ playwright }) => {
-  // Remove what the first test created so the dev database stays clean.
-  const api = await playwright.request.newContext({
-    baseURL: "http://127.0.0.1:3100",
-  });
-  await api.post("/api/auth/login", { data: ADMIN });
-  const res = await api.get(`/api/products?search=${encodeURIComponent(NAME)}`);
-  const body = await res.json();
-  for (const p of body.data ?? []) {
-    if (p.name === NAME) await api.delete(`/api/products/${p.id}`);
-  }
-  await api.dispose();
 });
