@@ -84,6 +84,8 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   totp_enabled: "Aktifkan verifikasi 2 langkah",
   totp_disabled: "Matikan verifikasi 2 langkah",
   totp_devices_revoked: "Lupakan perangkat tepercaya",
+  google_signup: "Daftar lewat Google",
+  google_linked: "Hubungkan akun Google",
 };
 
 export function auditActionLabel(value: string) {

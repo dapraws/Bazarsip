@@ -18,7 +18,11 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
+    -- Null for accounts created through Google. No placeholder hash: a row
+    -- that looks like it has a password invites code that treats it as one.
+    password VARCHAR(255),
+    -- Google's stable subject id. Emails change and can be reassigned.
+    google_id VARCHAR(64),
     role VARCHAR(50) DEFAULT 'customer' CHECK (role IN ('customer', 'admin')),
     -- Two-factor. The secret exists before it is switched on, between showing
     -- the QR and the first correct code.
@@ -142,6 +146,7 @@ CREATE INDEX idx_orders_order_number ON orders(order_number);
 CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX idx_users_email ON users(email);
+CREATE UNIQUE INDEX idx_users_google_id ON users(google_id) WHERE google_id IS NOT NULL;
 
 -- Starter categories. Item type only: who a product is for, what age, what
 -- style and which brand are separate columns on products, so an item can be

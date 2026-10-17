@@ -17,7 +17,11 @@ export async function POST(req: NextRequest) {
     const { challenge, code, remember } = await req.json();
     const ip = clientIp(req);
 
-    const userId = challenge ? readChallenge(challenge) : null;
+    // The password flow posts the challenge; the Google flow cannot, because
+    // it arrives back as a redirect, so it leaves one in an httpOnly cookie
+    // rather than putting a credential in the URL.
+    const token = challenge ?? req.cookies.get("pending_2fa")?.value;
+    const userId = token ? readChallenge(token) : null;
     if (!userId) {
       return NextResponse.json(
         { success: false, error: "Sesi verifikasi kedaluwarsa. Masuk lagi." },
@@ -78,6 +82,7 @@ export async function POST(req: NextRequest) {
       });
 
       const session = issueSession(user);
+      session.cookies.delete("pending_2fa");
       if (remember) await trustDevice(user.id, req, session);
       return session;
     }
@@ -102,6 +107,7 @@ export async function POST(req: NextRequest) {
       });
 
       const session = issueSession(user);
+      session.cookies.delete("pending_2fa");
       if (remember) await trustDevice(user.id, req, session);
       return session;
     }

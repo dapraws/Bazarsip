@@ -88,6 +88,20 @@ export async function POST(req: NextRequest) {
     }
 
     const user = userRes.rows[0];
+
+    // An account created through Google has no password at all. Comparing
+    // against null throws, and inventing a placeholder hash would leave a
+    // row that looks like it can be signed into with a password.
+    if (!user.password) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Akun ini dibuat lewat Google. Masuk dengan tombol Google.",
+        },
+        { status: 400 },
+      );
+    }
+
     const isValid = await bcrypt.compare(password, user.password);
 
     if (!isValid) {

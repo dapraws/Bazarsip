@@ -19,7 +19,9 @@ export type AuditAction =
   | "user_delete"
   | "totp_enabled"
   | "totp_disabled"
-  | "totp_devices_revoked";
+  | "totp_devices_revoked"
+  | "google_signup"
+  | "google_linked";
 
 interface AuditEntry {
   action: AuditAction;
