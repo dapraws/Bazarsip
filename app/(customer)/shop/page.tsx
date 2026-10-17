@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { formatRupiah } from "@/lib/format";
+import { sizedImage } from "@/lib/image";
 import {
   GENDERS,
   AGE_GROUPS,
@@ -362,7 +363,7 @@ function ProductCard({ p }: { p: Product }) {
       <div className="relative overflow-hidden rounded-2xl bg-neutral-200">
         {img ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={img} alt={p.name} className="h-full w-full object-cover" />
+          <img src={sizedImage(img, 640)} alt={p.name} className="h-full w-full object-cover" />
         ) : (
           <div className="aspect-4/5 w-full" />
         )}

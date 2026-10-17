@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { formatRupiah } from "@/lib/format";
+import { sizedImage } from "@/lib/image";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -96,7 +97,7 @@ export default function ProductDetailPage({ params }: PageProps) {
               <div className="bg-gray-100 rounded-lg mb-4">
                 {selectedImage ? (
                   <img
-                    src={selectedImage}
+                    src={sizedImage(selectedImage, 1200)}
                     alt={product.name}
                     className="w-full h-96 object-contain"
                   />
@@ -119,7 +120,7 @@ export default function ProductDetailPage({ params }: PageProps) {
                       }`}
                     >
                       <img
-                        src={img}
+                        src={sizedImage(img, 200)}
                         alt=""
                         className="w-full h-20 object-cover"
                       />

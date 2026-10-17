@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { formatRupiah } from "@/lib/format";
+import { sizedImage } from "@/lib/image";
 
 type Product = {
   id: number;
@@ -147,7 +148,10 @@ export default function CartPage() {
                 className="bg-white rounded-xl shadow-sm border p-6 flex items-center space-x-4"
               >
                 <Image
-                  src={item.product?.image_url ?? "/placeholder.png"}
+                  src={
+                    sizedImage(item.product?.image_url, 192) ||
+                    "/placeholder.png"
+                  }
                   alt={item.product?.name ?? "Product"}
                   width={96}
                   height={96}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatRupiah } from "@/lib/format";
+import { sizedImage } from "@/lib/image";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -174,7 +175,7 @@ export default function AdminOrderDetailPage({ params }: PageProps) {
                   >
                     {item.image_url && (
                       <img
-                        src={item.image_url}
+                        src={sizedImage(item.image_url, 160)}
                         alt={item.product_name}
                         className="w-20 h-20 object-cover rounded-lg"
                       />

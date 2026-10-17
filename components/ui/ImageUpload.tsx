@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { sizedImage } from "@/lib/image";
 
 type CloudinaryFolder =
   | "bazarsip/products"
@@ -224,7 +225,7 @@ export default function ImageUpload({
               className="relative group rounded-xl overflow-hidden border border-gray-200 bg-gray-50 aspect-square"
             >
               <img
-                src={url}
+                src={sizedImage(url, 300)}
                 alt={`Image ${index + 1}`}
                 className="w-full h-full object-cover"
               />

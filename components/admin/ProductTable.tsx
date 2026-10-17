@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { formatRupiah } from "@/lib/format";
+import { sizedImage } from "@/lib/image";
 
 interface Product {
   id: number;
@@ -28,13 +29,16 @@ function Thumb({ product, size }: { product: Product; size: number }) {
   if (product.image_url) {
     return (
       <Image
-        src={product.image_url}
+        src={sizedImage(product.image_url, 128)}
         alt={product.name}
         width={size}
         height={size}
         className="rounded object-cover shrink-0"
         style={{ width: size, height: size }}
         loading="lazy"
+        // Cloudinary already returns the right size and format, so routing
+        // it through our own optimizer only burns VPS CPU.
+        unoptimized
       />
     );
   }

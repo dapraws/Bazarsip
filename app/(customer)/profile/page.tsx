@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import ImageUpload from "@/components/ui/ImageUpload";
+import { sizedImage } from "@/lib/image";
 
 export default function ProfilePage() {
   const [formData, setFormData] = useState({
@@ -64,7 +65,7 @@ export default function ProfilePage() {
             <div className="flex-shrink-0">
               {formData.avatar_url ? (
                 <img
-                  src={formData.avatar_url}
+                  src={sizedImage(formData.avatar_url, 160)}
                   alt="Foto profil"
                   className="w-20 h-20 rounded-full object-cover border-4 border-white shadow"
                 />

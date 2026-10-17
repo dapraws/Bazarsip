@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ImageUpload from "@/components/ui/ImageUpload";
+import { sizedImage } from "@/lib/image";
 
 interface Category {
   id: number;
@@ -174,7 +175,7 @@ export default function AdminCategoriesPage() {
             >
               {category.image_url ? (
                 <img
-                  src={category.image_url}
+                  src={sizedImage(category.image_url, 640)}
                   alt={category.name}
                   className="w-full h-48 object-cover"
                 />

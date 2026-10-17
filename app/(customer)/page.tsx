@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { pool } from "@/lib/db";
+import { sizedImage } from "@/lib/image";
 
 type Product = {
   id: number;
@@ -169,7 +170,7 @@ export default async function LandingPage() {
               >
                 <div className="relative h-36 overflow-hidden rounded-2xl bg-neutral-100">
                   <Image
-                    src={pickCategoryImage(c)}
+                    src={sizedImage(pickCategoryImage(c), 640)}
                     alt={c.name}
                     fill
                     className="object-cover"
@@ -284,7 +285,7 @@ function ProductMiniCard({ p }: { p: Product }) {
       <div className="relative overflow-hidden rounded-2xl">
         <div className="relative aspect-[4/5] w-full bg-neutral-200">
           <Image
-            src={img}
+            src={sizedImage(img, 640)}
             alt={p.name}
             fill
             className="object-cover"
