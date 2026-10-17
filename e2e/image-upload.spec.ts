@@ -107,3 +107,34 @@ test("script Cloudinary hanya dimuat sekali walau ada dua pengunggah", async ({
 
   expect(tags, "bundle yang sama diunduh dua kali").toBeLessThanOrEqual(1);
 });
+
+test("foto dikecilkan di HP sebelum diunggah", async ({ page }) => {
+  // Capture what the widget is configured with. Without maxImageWidth the
+  // full-resolution camera file goes over mobile data, which is the whole
+  // cost of uploading a catalogue.
+  await page.addInitScript(`
+    window.__config = null;
+    window.cloudinary = {
+      createUploadWidget: (config) => {
+        window.__config = config;
+        return { open: () => {}, destroy: () => {} };
+      },
+    };
+  `);
+
+  await login(page, ADMIN);
+  await page.goto("/products/new");
+  await page.getByRole("button", { name: /Unggah foto/i }).last().click();
+
+  const config = await page.evaluate(() => (window as any).__config);
+
+  expect(config, "widget tidak pernah dibuat").toBeTruthy();
+  expect(
+    config.maxImageWidth,
+    "tanpa ini, foto 4000px diunggah apa adanya",
+  ).toBe(1600);
+  expect(
+    config.maxFileSize,
+    "batas terlalu rendah menolak foto HP, bukan mengecilkannya",
+  ).toBeGreaterThan(10_000_000);
+});

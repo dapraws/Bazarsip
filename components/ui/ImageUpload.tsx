@@ -132,7 +132,18 @@ export default function ImageUpload({
         sources: ["local", "url", "camera"],
         resourceType: "image",
         clientAllowedFormats: ["jpg", "jpeg", "png", "webp", "avif"],
-        maxFileSize: 5_000_000,
+
+        // Scale down in the browser before anything is sent. A phone camera
+        // produces roughly 4000px and several megabytes; the largest place
+        // any of this is shown is a product page, so the rest of those pixels
+        // are paid for on the seller's mobile data and then thrown away.
+        maxImageWidth: 1600,
+        maxImageFileSize: 2_000_000,
+
+        // Generous on purpose. The resize above is what keeps uploads small;
+        // this limit only exists to reject something absurd. At 5MB it was
+        // refusing ordinary phone photos outright instead of shrinking them.
+        maxFileSize: 25_000_000,
         cropping: false,
         showAdvancedOptions: false,
         showCompletedButton: true,
